@@ -26,7 +26,7 @@
         </el-col>
         <el-col :span="1">
             <div class="vcenter">
-                <el-dropdown trigger="hover">
+                <el-dropdown trigger="hover" style="height: 40px">
                     <span class="el-dropdown-link" style="height: 40px">
                          <el-avatar size="40"
                                     src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>

@@ -6,13 +6,18 @@
         <router-link :to="{name:'orderlist'}">点击这里去订单列表</router-link>
         <br/>
         <router-link :to="{name:'orderdetail',params:{orderCode:'001'}}">点击这里去订单详情</router-link>
+        <zhexian/>
     </div>
 
 </template>
 
 <script>
+    import  zhexian from '@/echarts/home/zhexian'
+    import Zhexian from "../../echarts/home/zhexian";
     export default {
-        name: "home"
+        name: "home",
+        components: {Zhexian},
+        zhexian
     }
 </script>
 

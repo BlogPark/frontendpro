@@ -5,12 +5,14 @@ import App from './App.vue'
 import router from "@/router"
 import Element from "element-ui"
 import '@/styles/element-variables.scss'
+import echarts from 'echarts'
 
 
 import '@/styles/index.scss' // global css
 import store from "@/store"
 
 Vue.config.productionTip = false
+Vue.prototype.$echarts = echarts
 
 Vue.use(Element)
 
