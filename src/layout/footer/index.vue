@@ -1,12 +1,12 @@
 <template>
     <div>
-        顶部区域{{this.$store.state.count}}
+        <span>这里是脚底</span>
     </div>
 </template>
 
 <script>
     export default {
-        name: "navbar"
+        name: "footer"
     }
 </script>
 

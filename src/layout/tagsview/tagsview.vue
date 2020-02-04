@@ -1,12 +1,12 @@
 <template>
     <div>
-        顶部区域{{this.$store.state.count}}
+
     </div>
 </template>
 
 <script>
     export default {
-        name: "navbar"
+        name: "tagsview"
     }
 </script>
 

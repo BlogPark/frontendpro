@@ -69,17 +69,23 @@ axios.interceptors.response.use(
  * @returns {Promise}
  */
 export function fetch(url, params = {}) {
+    console.log('执行')
     return new Promise((resolve, reject) => {
         axios.get(url, {
             params: params
         })
             .then(response => {
-                if (response.data.code === 200) {
-                    //返回成功处理  这里传的啥 后续调用的时候 res就是啥
-                    resolve(response.data.data);//我们后台所有数据都是放在返回的data里所以这里统一处理了
-                } else {
-                    //错误处理
-                    Message.error(response.data.msg)
+                console.log(response.status)
+                if (response.status === 200) {
+                    if (response.data.code === 1000) {
+                        //返回成功处理  这里传的啥 后续调用的时候 res就是啥
+                        resolve(response.data.data);//我们后台所有数据都是放在返回的data里所以这里统一处理了
+                    } else {
+                        //错误处理
+                        Message.error(response.data.message)
+                    }
+                }else {
+                    Message.error("服务器异常！！")
                 }
             })
             .catch(err => {

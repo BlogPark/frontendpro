@@ -1,5 +1,13 @@
 <template>
-    <h1>这里是首页</h1>
+    <div>
+        <h1>这里是首页</h1>
+        <router-link  to="login">点击这里去登录</router-link>
+        <br/>
+        <router-link :to="{name:'orderlist'}">点击这里去订单列表</router-link>
+        <br/>
+        <router-link :to="{name:'orderdetail',params:{orderCode:'001'}}">点击这里去订单详情</router-link>
+    </div>
+
 </template>
 
 <script>

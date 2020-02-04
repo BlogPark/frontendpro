@@ -8,23 +8,30 @@ export default new VueRouter({
         [
             {
                 path: "/login",
+                name: "login",
                 component: () => import("@/view/login/index.vue")
             },
             {
-                path: "/layout",
+                path: "/",
                 component: () => import("@/layout/index.vue"),
+                redirect:'/index',
                 children: [
+                    {
+                      path:'/index',
+                        name: "index",
+                        component: () => import("@/view/home/index.vue")
+                    },
                     {
                         path: "/order",
                         name: "orderlist",
                         component: () => import("@/view/order/orderlist.vue")
+                    },
+                    {
+                        path: "/orderdetail",
+                        name: "orderdetail",
+                        component: () => import("@/view/order/orderdetail.vue")
                     }
                 ]
-            },
-            {
-                path: "/",
-                component: () => import("@/view/home/index.vue")
             }
         ]
 })
-;
