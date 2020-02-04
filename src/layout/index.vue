@@ -1,14 +1,15 @@
 <template>
-    <div style="min-height: 100%">
-        <el-container style="min-height: 100%; border: 1px  #eee">
+    <div style="height: 100%">
+        <el-container style="height:100%;border: 1px  #eee">
             <sidebar/>
-            <el-container>
-                <el-header style="font-size: 12px;height: 60px">
+            <el-container direction="vertical">
+                <el-header style="height: 40px">
                     <navbar/>
                 </el-header>
-                <tagsview/>
                 <el-main>
-                    <dmain/>
+                    <el-scrollbar>
+                        <dmain/>
+                    </el-scrollbar>
                 </el-main>
                 <el-footer>
                     <dfooter/>
@@ -23,7 +24,6 @@
     import navbar from "@/layout/navbar"
     import dmain from "@/layout/main"
     import dfooter from "@/layout/footer"
-    import tagsview from "@/layout/tagsview/tagsview.vue"
 
     export default {
         name: "layout",
@@ -31,8 +31,7 @@
             navbar,
             sidebar,
             dmain,
-            dfooter,
-            tagsview
+            dfooter
         }
     }
 </script>
@@ -41,22 +40,26 @@
     .el-header {
         background-color: #B3C0D1;
         color: #333;
-        line-height: 60px;
+        line-height: 40px;
+        font-size: 14px;
+        height: 40px;
+        text-align: right;
+        padding: 0px 30px 0px 0px;
     }
 
     .el-main {
-        padding: 5px 25px;
-        position:relative;
-        width:100%;
-        min-height:100%;
-        padding-bottom: 60px;
-        box-sizing: border-box;
-    }
-    .el-footer{
+        padding: 5px 25px 0px 25px;
         width: 100%;
-        height:100px;   /* footer的高度一定要是固定值*/
-        position:absolute;
-        bottom:0px;
+        height: 100%;
+        margin-bottom: 70px;
+    }
+
+    .el-footer {
+        width: 100%;
+        height: 100px; /* footer的高度一定要是固定值*/
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
         background: #B3C0D1;
     }
 </style>

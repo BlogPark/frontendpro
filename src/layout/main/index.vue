@@ -1,8 +1,6 @@
 <template>
     <div>
-        <el-container>
-            <router-view/>
-        </el-container>
+        <router-view/>
     </div>
 </template>
 

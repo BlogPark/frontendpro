@@ -1,33 +1,37 @@
 <template>
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246);min-height: 100%">
+    <el-aside style="background-color: rgb(238, 241, 246);min-height: 100%" width="200px">
         <div class="weblogo">
             DEMO
         </div>
-        <el-scrollbar wrap-class="scrollbar-wrapper" >
+        <el-scrollbar wrap-class="scrollbar-wrapper">
             <el-menu
-                    default-active="0"
-                    class="el-menu-vertical-demo"
+                    @close="handleClose"
+                    @open="handleOpen"
+                    active-text-color="#ffd04b"
                     background-color="#545c64"
-                    text-color="#fff"
-                    active-text-color="#ffd04b">
-                <el-menu-item index="0" key="index">
+                    class="el-menu-vertical-demo"
+                    default-active="0"
+                    text-color="#fff">
+                <el-menu-item @click="clickmenu('/index')" index="0" key="index">
                     <i class="el-icon-s-home"></i>
                     <span>首页</span>
                 </el-menu-item>
-                <template v-for="(item,index) in menus" :index="item.id">
+                <template :index="item.id" v-for="(item,index) in menus">
                     <template v-if="item.childCount>0">
                         <el-submenu :index="index+1+''" :key="item.id">
                             <template slot="title">
                                 <i :class="item.menuIcon"></i>
                                 <span>{{item.menuName}}</span>
                             </template>
-                            <el-menu-item class="menuitems" v-for="subItem in item.childMenus" :key="subItem.id" :index="subItem.id+''">
-                               <span class="childmenu">{{ subItem.menuName }}</span>
+                            <el-menu-item :index="subItem.id+''" :key="subItem.id"
+                                          @click="clickmenu(subItem.menuRouter)"
+                                          class="menuitems" v-for="subItem in item.childMenus">
+                                <span class="childmenu">{{ subItem.menuName }}</span>
                             </el-menu-item>
                         </el-submenu>
                     </template>
                     <template v-else>
-                        <el-menu-item :index="index+1+''" :key="item.id">
+                        <el-menu-item :index="index+1+''" :key="item.id" @click="clickmenu(item.menuRouter)">
                             <i :class="item.menuIcon"></i>
                             <span>{{item.menuName}}</span>
                         </el-menu-item>
@@ -57,26 +61,15 @@
                     this.menus = response;
                 })
             },
-            clickMenu(componentName) {
-                this.openedTab = this.$store.state.openedTab
-                // tabNum 为当前点击的列表项在openedTab中的index，若不存在则为-1
-                let tabNum = this.openedTab.indexOf(componentName)
-                console.log(tabNum)
-                console.log(this.openedTab)
-                console.log(this.$store.state.openedTab)
-                if (tabNum === -1) {
-                    // 该标签当前没有打开
-                    // 将componentName加入到已打开标签页state.openedTab数组中
-                    this.$store.commit('addTab', {
-                        title: componentName,
-                        name: componentName,
-                        allowclose: true,
-                        type: 'info'
-                    })
-                } else {
-                    // 该标签是已经打开过的，需要激活此标签页
-                    this.$store.commit('changeTab', componentName)
-                }
+            handleOpen(key, keyPath) {
+                console.log(keyPath);
+            },
+            handleClose(key, keyPath) {
+                console.log(key, keyPath);
+            },
+            clickmenu(routerpath) {
+                console.log(routerpath);
+                this.$router.push({path: routerpath});
             }
         },
         created() {
@@ -89,6 +82,7 @@
     aside {
         color: #333;
         padding: 0px;
+        margin: 0px;
     }
 
     .weblogo {
@@ -97,13 +91,16 @@
         line-height: 60px;
         color: black;
     }
-    .childmenu{
+
+    .childmenu {
         color: rgb(191, 203, 217);
     }
-    .el-submenu__title{
+
+    .el-submenu__title {
         font-size: 16px;
     }
-    .menuitems{
+
+    .menuitems {
         min-width: 190px;
     }
 </style>
