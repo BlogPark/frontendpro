@@ -30,6 +30,11 @@ export default new VueRouter({
                         path: "/orderdetail",
                         name: "orderdetail",
                         component: () => import("@/view/order/orderdetail.vue")
+                    },
+                    {
+                        path: "/pinboard",
+                        name: "pinboard",
+                        component: () => import("@/view/pinboard/index.vue")
                     }
                 ]
             }

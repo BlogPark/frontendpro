@@ -48,10 +48,11 @@
     }
 
     .el-main {
-        padding: 5px 25px 0px 25px;
+        padding: 0px;
         width: 100%;
         height: 100%;
-        margin-bottom: 70px;
+        margin-bottom: 60px;
+        background-color: #E7E7E7;
     }
 
     .el-footer {

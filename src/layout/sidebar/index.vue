@@ -7,11 +7,12 @@
             <el-menu
                     @close="handleClose"
                     @open="handleOpen"
-                    active-text-color="#ffd04b"
                     background-color="#545c64"
+                    text-color="#fff"
+                    active-text-color="#ffd04b"
                     class="el-menu-vertical-demo"
-                    default-active="0"
-                    text-color="#fff">
+                    unique-opened
+                    default-active="0">
                 <el-menu-item @click="clickmenu('/index')" index="0" key="index">
                     <i class="el-icon-s-home"></i>
                     <span>首页</span>
@@ -26,7 +27,7 @@
                             <el-menu-item :index="subItem.id+''" :key="subItem.id"
                                           @click="clickmenu(subItem.menuRouter)"
                                           class="menuitems" v-for="subItem in item.childMenus">
-                                <span class="childmenu">{{ subItem.menuName }}</span>
+                                <span>{{ subItem.menuName }}</span>
                             </el-menu-item>
                         </el-submenu>
                     </template>
@@ -79,6 +80,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/style.css";
     aside {
         color: #333;
         padding: 0px;
@@ -90,6 +92,7 @@
         height: 60px;
         line-height: 60px;
         color: black;
+        text-align: center;
     }
 
     .childmenu {
@@ -102,5 +105,8 @@
 
     .menuitems {
         min-width: 190px;
+    }
+    .submenu{
+        background-color: #3dc7ab;
     }
 </style>

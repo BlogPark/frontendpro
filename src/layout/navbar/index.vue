@@ -28,7 +28,7 @@
             <div class="vcenter">
                 <el-dropdown trigger="hover" style="height: 40px">
                     <span class="el-dropdown-link" style="height: 40px">
-                         <el-avatar size="40"
+                         <el-avatar
                                     src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
                     </span>
                     <el-dropdown-menu placement="bottom-start" slot="dropdown">
