@@ -35,6 +35,11 @@ export default new VueRouter({
                         path: "/pinboard",
                         name: "pinboard",
                         component: () => import("@/view/pinboard/index.vue")
+                    },
+                    {
+                        path: "/editor",
+                        name: "editorview",
+                        component: () => import("@/view/editorview/index.vue")
                     }
                 ]
             }
