@@ -1,9 +1,9 @@
 <template>
     <div class="tinymce-editor">
-        <editorvue v-model="myValue"
-                :init="init"
-                :disabled="disabled"
-                @onClick="onClick">
+        <editorvue :disabled="disabled"
+                   :init="init"
+                   @onClick="onClick"
+                   v-model="myValue">
         </editorvue>
     </div>
 </template>
@@ -14,14 +14,14 @@
     import 'tinymce/themes/silver'
     // 编辑器插件plugins
     // 更多插件参考：https://www.tiny.cloud/docs/plugins/
-    import 'tinymce/plugins/image'// 插入上传图片插件
-    import 'tinymce/plugins/media'// 插入视频插件
-    import 'tinymce/plugins/table'// 插入表格插件
-    import 'tinymce/plugins/lists'// 列表插件
-    import 'tinymce/plugins/wordcount'// 字数统计插件
+    import 'tinymce/plugins/image' // 插入上传图片插件
+    import 'tinymce/plugins/media' // 插入视频插件
+    import 'tinymce/plugins/table' // 插入表格插件
+    import 'tinymce/plugins/lists' // 列表插件
+    import 'tinymce/plugins/wordcount' // 字数统计插件
     export default {
         name: "tinymce",
-        components:{editorvue},
+        components: {editorvue},
         props: {
             value: {
                 type: String,
@@ -40,7 +40,7 @@
                 default: 'undo redo |  formatselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | lists image media table | removeformat'
             }
         },
-        data () {
+        data() {
             return {
                 init: {
                     language_url: '/tinymce/langs/zh_CN.js',
@@ -62,25 +62,25 @@
                 myValue: this.value
             }
         },
-        mounted () {
+        mounted() {
             tinymce.init({})
         },
         methods: {
             // 添加相关的事件，可用的事件参照文档=> https://github.com/tinymce/tinymce-vue => All available events
             // 需要什么事件可以自己增加
-            onClick (e) {
+            onClick(e) {
                 this.$emit('onClick', e, tinymce)
             },
             // 可以添加一些自己的自定义事件，如清空内容
-            clear () {
+            clear() {
                 this.myValue = ''
             }
         },
         watch: {
-            value (newValue) {
+            value(newValue) {
                 this.myValue = newValue
             },
-            myValue (newValue) {
+            myValue(newValue) {
                 this.$emit('input', newValue)
             }
         }
