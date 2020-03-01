@@ -40,6 +40,11 @@ export default new VueRouter({
                         path: "/editor",
                         name: "editorview",
                         component: () => import("@/view/editorview/index.vue")
+                    },
+                    {
+                        path:"/drools/entity",
+                        name:"entity",
+                        component: () => import("@/view/drools/entitylist.vue")
                     }
                 ]
             }

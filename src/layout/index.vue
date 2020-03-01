@@ -48,7 +48,7 @@
     }
 
     .el-main {
-        padding: 0px;
+        padding: 15px 15px 10px 15px;
         width: 100%;
         height: 100%;
         margin-bottom: 60px;

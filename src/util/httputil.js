@@ -109,14 +109,21 @@ export function post(url, data = {}) {
     return new Promise((resolve, reject) => {
         axios.post(url, data)
             .then(response => {
-                if (response.data.code === 200) {
-                    resolve(response.data.data);
+                if (response.status === 200) {
+                    if (response.data.code === 1000) {
+                        //返回成功处理  这里传的啥 后续调用的时候 res就是啥
+                        resolve(response.data.data);//我们后台所有数据都是放在返回的data里所以这里统一处理了
+                    } else {
+                        //错误处理
+                        Message.error(response.data.message)
+                    }
                 } else {
                     Message(response.data.msg)
                 }
             }, err => {
                 reject(err);
                 let message = '请求失败！请检查网络';
+                console.log(err);
                 if (err.response) message = err.response.data.message;
                 Message.error(message)
             })
