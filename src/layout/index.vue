@@ -1,66 +1,102 @@
 <template>
-    <div style="height: 100%">
-        <el-container style="height:100%;border: 1px  #eee">
-            <sidebar/>
-            <el-container direction="vertical">
-                <el-header style="height: 40px">
-                    <navbar/>
-                </el-header>
-                <el-main>
-                    <el-scrollbar>
-                        <dmain/>
-                    </el-scrollbar>
-                </el-main>
-                <el-footer>
-                    <dfooter/>
-                </el-footer>
-            </el-container>
-        </el-container>
+  <div :class="classObj" class="app-wrapper">
+    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
+    <sidebar class="sidebar-container" />
+    <div :class="{hasTagsView:needTagsView}" class="main-container">
+      <div :class="{'fixed-header':fixedHeader}">
+        <navbar />
+        <tags-view v-if="needTagsView" />
+      </div>
+      <app-main />
+      <right-panel v-if="showSettings">
+        <settings />
+      </right-panel>
     </div>
+  </div>
 </template>
 
 <script>
-    import sidebar from "@/layout/sidebar"
-    import navbar from "@/layout/navbar"
-    import dmain from "@/layout/main"
-    import dfooter from "@/layout/footer"
+import RightPanel from '@/components/RightPanel'
+import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
+import ResizeMixin from './mixin/ResizeHandler'
+import { mapState } from 'vuex'
 
-    export default {
-        name: "layout",
-        components: {
-            navbar,
-            sidebar,
-            dmain,
-            dfooter
-        }
+export default {
+  name: 'Layout',
+  components: {
+    AppMain,
+    Navbar,
+    RightPanel,
+    Settings,
+    Sidebar,
+    TagsView
+  },
+  mixins: [ResizeMixin],
+  computed: {
+    ...mapState({
+      sidebar: state => state.app.sidebar,
+      device: state => state.app.device,
+      showSettings: state => state.settings.showSettings,
+      needTagsView: state => state.settings.tagsView,
+      fixedHeader: state => state.settings.fixedHeader
+    }),
+    classObj() {
+      return {
+        hideSidebar: !this.sidebar.opened,
+        openSidebar: this.sidebar.opened,
+        withoutAnimation: this.sidebar.withoutAnimation,
+        mobile: this.device === 'mobile'
+      }
     }
+  },
+  methods: {
+    handleClickOutside() {
+      this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
+    }
+  }
+}
 </script>
 
-<style scoped>
-    .el-header {
-        background-color: #B3C0D1;
-        color: #333;
-        line-height: 40px;
-        font-size: 14px;
-        height: 40px;
-        text-align: right;
-        padding: 0px 30px 0px 0px;
-    }
+<style lang="scss" scoped>
+  @import "~@/assets/styles/mixin.scss";
+  @import "~@/assets/styles/variables.scss";
 
-    .el-main {
-        padding: 15px 15px 10px 15px;
-        width: 100%;
-        height: 100%;
-        margin-bottom: 60px;
-        background-color: #E7E7E7;
-    }
+  .app-wrapper {
+    @include clearfix;
+    position: relative;
+    height: 100%;
+    width: 100%;
 
-    .el-footer {
-        width: 100%;
-        height: 100px; /* footer的高度一定要是固定值*/
-        position: absolute;
-        left: 0px;
-        bottom: 0px;
-        background: #B3C0D1;
+    &.mobile.openSidebar {
+      position: fixed;
+      top: 0;
     }
+  }
+
+  .drawer-bg {
+    background: #000;
+    opacity: 0.3;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    position: absolute;
+    z-index: 999;
+  }
+
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 9;
+    width: calc(100% - #{$sideBarWidth});
+    transition: width 0.28s;
+  }
+
+  .hideSidebar .fixed-header {
+    width: calc(100% - 54px)
+  }
+
+  .mobile .fixed-header {
+    width: 100%;
+  }
 </style>

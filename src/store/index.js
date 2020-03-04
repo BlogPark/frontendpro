@@ -1,42 +1,23 @@
-import Vue from "vue"
-import Vuex from "vuex"
-import  tagsView from "./modules/tagsView"
+import Vue from 'vue'
+import Vuex from 'vuex'
+import app from './modules/app'
+import user from './modules/user'
+import tagsView from './modules/tagsView'
+import permission from './modules/permission'
+import settings from './modules/settings'
+import getters from './getters'
 
 Vue.use(Vuex)
 
-const state = {
-    count: 0,
-    openedTab: [{
-        title: '首页',
-        name: 'home',
-        allowclose: true,
-        type:'info'
-    }],
-    activeTab: ''
-}
-
-const mutations = {
-    addcount(state, n = 0) {
-        return (state.count += n);
-    },
-    addTab(state, data) {
-        state.openedTab.push(data)
-
-    },
-    changeTab(state, componentName) {
-        state.activeTab = componentName
-    },
-    deductTab (state, componentName) {
-        let index = state.openedTab.indexOf(componentName)
-        state.openedTab.splice(index, 1)
-    }
-}
-
-const actions = {}
-
-export default new Vuex.Store({
-    state,
-    mutations,
-    actions,
-    tagsView
+const store = new Vuex.Store({
+  modules: {
+    app,
+    user,
+    tagsView,
+    permission,
+    settings
+  },
+  getters
 })
+
+export default store

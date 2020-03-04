@@ -20,7 +20,7 @@
     import 'tinymce/plugins/lists' // 列表插件
     import 'tinymce/plugins/wordcount' // 字数统计插件
     export default {
-        name: "tinymce",
+        name: "Tinymce",
         components: {editorvue},
         props: {
             value: {
@@ -46,7 +46,7 @@
                     language_url: '/tinymce/langs/zh_CN.js',
                     language: 'zh_CN',
                     //skin_url: '/tinymce/skins/ui/oxide',
-                    skin_url: '/tinymce/skins/ui/oxide-dark',//暗色系
+                    skin_url: '/tinymce/skins/ui/oxide-dark', //暗色系
                     height: 300,
                     plugins: this.plugins,
                     toolbar: this.toolbar,
