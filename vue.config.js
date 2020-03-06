@@ -30,7 +30,7 @@ module.exports = {
         proxy: {
             '/api/demo': {
                 // target: 'http://s.ngrok.zonybir.com',
-                target: 'http://127.0.0.1:8080',
+                target: 'http://127.0.0.1:8009',
                 //target: 'http://10.7.24.178:15000',
                 // target: 'http://10.7.130.46:8888',
                 changeOrigin: true,

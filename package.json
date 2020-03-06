@@ -1,7 +1,7 @@
 {
   "name": "frontendpro",
   "version": "0.1.0",
-  "description": "若依管理系统",
+  "description": "管理系统",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
