@@ -1,9 +1,8 @@
 <template>
-    <div>
+    <div class="app-container">
         <el-table
                 :data="entitylist"
-                border
-                style="width: 100%">
+                v-loading="loading">
             <el-table-column
                     label="实体名称"
                     prop="entityName"
@@ -12,7 +11,7 @@
             <el-table-column
                     label="实体路径"
                     prop="entityPackage"
-                    width="250">
+                    width="350">
             </el-table-column>
             <el-table-column
                     label="实体描述"
@@ -29,15 +28,22 @@
                     prop="eneityRemark">
             </el-table-column>
             <el-table-column
-                    fixed="right"
-                    label="操作"
-                    width="100">
+                    align="center" class-name="small-padding fixed-width"
+                    label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="watchDetail(scope.row.id)" size="small" type="text">查看</el-button>
-                    <el-button size="small" type="text">编辑</el-button>
+                    <el-button @click="watchDetail(scope.row.id)" icon="el-icon-view" size="small" type="text">查看
+                    </el-button>
+                    <el-button icon="el-icon-edit" size="small" type="text">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <pagination
+                :limit.sync="pageSize"
+                :page.sync="pageIndex"
+                :total="total"
+                @pagination="loadData"
+                v-show="total>0"
+        />
         <el-dialog :visible.sync="dialogTableVisible" title="字段详情" width="30%">
             <el-table :data="entityInfoList" border stripe>
                 <el-table-column label="字段名" property="fieldName" width="150"></el-table-column>
@@ -55,25 +61,37 @@
         name: "entitylist",
         data() {
             return {
+                // 遮罩层
+                loading: true,
                 entitylist: [],
                 groupName: '',
                 groupId: '',
                 entityName: '',
                 id: 0,
                 dialogTableVisible: false,
-                entityInfoList: []
+                entityInfoList: [],
+                pageIndex: 1,
+                pageSize: 10,
+                total: 0
             }
         },
         methods: {
             loadData() {
+                this.loading = true;
                 var postdata = {
                     id: this.id,
                     groupName: this.groupName,
                     entityName: this.entityName,
-                    groupId: this.groupId
+                    groupId: this.groupId,
+                    pageSize: this.pageSize,
+                    pageIndex: this.pageIndex
                 }
                 getAllEntities(postdata).then((res) => {
                     this.entitylist = res.list;
+                    this.pageIndex = res.pageNum;
+                    this.pageSize = res.pageSize;
+                    this.total = res.total;
+                    this.loading = false;
                 });
             },
             watchDetail(id) {

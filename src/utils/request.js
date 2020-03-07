@@ -28,9 +28,9 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(res => {
         const code = res.data.code
-        console.log(code);
+        console.log(res.data.data);
         if (code === 1000) {
-            const subcode = res.data.data.code;
+            const subcode = res.data.data.code ?? 200;
             if (subcode === 401) {
                 MessageBox.confirm(
                     '登录状态已过期，您可以继续留在该页面，或者重新登录',

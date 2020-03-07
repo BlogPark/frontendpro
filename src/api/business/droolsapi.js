@@ -1,11 +1,17 @@
-import {fetch, post} from "../../utils/httputil";
+import request from '@/utils/request'
 
 export function getAllEntities(data) {
-    console.log('查询实体开始执行');
-    return post('/drools/entitylist', data)
+    return request({
+        url: '/drools/entitylist',
+        method: 'post',
+        data: data
+    })
 }
 
 export function getEntitiyInfo(data) {
-    console.log('查询实体明细开始执行');
-    return fetch('/drools/entityinfo', data)
+    return request({
+        url: '/drools/entityinfo',
+        method: 'get',
+        params: data
+    })
 }
