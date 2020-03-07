@@ -1,22 +1,23 @@
 <template>
     <div class="app-container">
         <el-table
-                :data="rulelist"
+                :data="templatelist"
                 v-loading="loading">
             <el-table-column
-                    label="规则编码"
-                    prop="ruleCode"
+                    align="center"
+                    label="模板编号"
+                    prop="id"
                     width="250">
             </el-table-column>
             <el-table-column
-                    label="规则名称"
-                    prop="ruleName"
+                    label="模板名称"
+                    prop="templateName"
                     width="350">
             </el-table-column>
             <el-table-column
-                    label="规则分组"
-                    prop="ruleGroup"
-                    width="180">
+                    label="模板描述"
+                    prop="templateDesc"
+                    width="400">
             </el-table-column>
             <el-table-column
                     label="创建时间"
@@ -50,10 +51,10 @@
 </template>
 
 <script>
-    import {getAllRule} from '@/api/business/droolsapi'
+    import {getAllTemplate} from '@/api/business/droolsapi'
 
     export default {
-        name: "rulelist",
+        name: "templatelist",
         data() {
             return {
                 // 遮罩层
@@ -61,10 +62,8 @@
                 //对话框
                 dialogTableVisible: false,
                 //规则列表
-                rulelist: [],
-                ruleName: '',
-                ruleCode: '',
-                ruleGroup: '',
+                templatelist: [],
+                templateName: '',
                 id: 0,
                 pageIndex: 1,
                 pageSize: 10,
@@ -76,14 +75,13 @@
                 this.loading = true;
                 var postdata = {
                     id: this.id,
-                    ruleCode: this.ruleCode,
-                    ruleName: this.ruleName,
-                    groupName: this.ruleGroup,
+                    templateName: this.templateName,
                     pageSize: this.pageSize,
-                    pageIndex: this.pageIndex
+                    pageIndex:
+                    this.pageIndex
                 }
-                getAllRule(postdata).then((res) => {
-                    this.rulelist = res.list;
+                getAllTemplate(postdata).then((res) => {
+                    this.templatelist = res.list;
                     this.pageIndex = res.pageNum;
                     this.pageSize = res.pageSize;
                     this.total = res.total;

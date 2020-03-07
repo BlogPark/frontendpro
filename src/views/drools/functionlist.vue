@@ -1,21 +1,27 @@
 <template>
     <div class="app-container">
         <el-table
-                :data="rulelist"
+                :data="functionlist"
                 v-loading="loading">
             <el-table-column
-                    label="规则编码"
-                    prop="ruleCode"
+                    align="center"
+                    label="函数编号"
+                    prop="id"
                     width="250">
             </el-table-column>
             <el-table-column
-                    label="规则名称"
-                    prop="ruleName"
+                    label="函数名称"
+                    prop="functionName"
                     width="350">
             </el-table-column>
             <el-table-column
-                    label="规则分组"
-                    prop="ruleGroup"
+                    label="函数描述"
+                    prop="functionDesc"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    label="分组名称"
+                    prop="groupName"
                     width="180">
             </el-table-column>
             <el-table-column
@@ -50,10 +56,10 @@
 </template>
 
 <script>
-    import {getAllRule} from '@/api/business/droolsapi'
+    import {getAllFunction} from '@/api/business/droolsapi'
 
     export default {
-        name: "rulelist",
+        name: "functionlist",
         data() {
             return {
                 // 遮罩层
@@ -61,10 +67,10 @@
                 //对话框
                 dialogTableVisible: false,
                 //规则列表
-                rulelist: [],
-                ruleName: '',
-                ruleCode: '',
-                ruleGroup: '',
+                functionlist: [],
+                functionName: '',
+                functionDesc: '',
+                groupName: '',
                 id: 0,
                 pageIndex: 1,
                 pageSize: 10,
@@ -76,14 +82,14 @@
                 this.loading = true;
                 var postdata = {
                     id: this.id,
-                    ruleCode: this.ruleCode,
-                    ruleName: this.ruleName,
-                    groupName: this.ruleGroup,
+                    functionName: this.functionName,
+                    groupName: this.groupName,
+                    functionDesc: this.functionDesc,
                     pageSize: this.pageSize,
                     pageIndex: this.pageIndex
                 }
-                getAllRule(postdata).then((res) => {
-                    this.rulelist = res.list;
+                getAllFunction(postdata).then((res) => {
+                    this.functionlist = res.list;
                     this.pageIndex = res.pageNum;
                     this.pageSize = res.pageSize;
                     this.total = res.total;
