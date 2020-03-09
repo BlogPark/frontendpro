@@ -5,7 +5,7 @@
                 <el-input
                         @keyup.enter.native="handleQuery"
                         clearable
-                        placeholder="请输入角色名称"
+                        placeholder="分组"
                         size="small"
                         style="width: 240px"
                         v-model="paramQuery.groupName"

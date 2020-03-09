@@ -68,6 +68,30 @@ export function getAllTemplate(data) {
     })
 }
 
+export function getSingleTemplate(data) {
+    return request({
+        url: '/drools/gettemplate',
+        method: 'get',
+        params: data
+    })
+}
+
+export function addTemplate(data) {
+    return request({
+        url: '/drools/addTemplate',
+        method: 'post',
+        data: data
+    })
+}
+
+export function editTemplate(data) {
+    return request({
+        url: '/drools/updatetemplate',
+        method: 'post',
+        data: data
+    })
+}
+
 /**函数部分*/
 export function getAllFunction(data) {
     return request({
