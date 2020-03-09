@@ -51,12 +51,11 @@
                     prop="createTime">
             </el-table-column>
             <el-table-column
-                    align="center" class-name="small-padding fixed-width"
+                    align="left" class-name="small-padding fixed-width"
                     label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="watchDetail(scope.row.id)" icon="el-icon-view" size="small" type="text">查看
+                    <el-button @click="openEdit(scope.row.id)" icon="el-icon-edit" size="small" type="text">编辑
                     </el-button>
-                    <el-button icon="el-icon-edit" size="small" type="text">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -67,18 +66,35 @@
                 @pagination="loadData"
                 v-show="total>0"
         />
-        <el-dialog :title="title" :visible.sync="dialogTableVisible" width="30%">
-            <!--<el-table :data="entityInfoList" border stripe>-->
-            <!--<el-table-column label="字段名" property="fieldName" width="150"></el-table-column>-->
-            <!--<el-table-column label="字段描述" property="fieldDesc" width="200"></el-table-column>-->
-            <!--<el-table-column label="字段类型" property="fieldType"></el-table-column>-->
-            <!--</el-table>-->
+        <el-dialog :title="title" :visible.sync="addoreditdislog" width="30%">
+            <el-form :model="groupdata" :rules="rules" label-width="80px" ref="postform">
+                <el-form-item label="分组名称" prop="groupName">
+                    <el-input placeholder="请输入分组名称" v-model="groupdata.groupName"/>
+                </el-form-item>
+                <el-form-item label="分组类型" prop="groupType">
+                    <el-select placeholder="请选择" v-model="groupdata.groupType">
+                        <el-option
+                                :key="dict.dictValue"
+                                :label="dict.dictLabel"
+                                :value="dict.dictLabel"
+                                v-for="dict in typeOptions"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="分组描述">
+                    <el-input placeholder="请输入分组描述" type="textarea" v-model="groupdata.groupDesc"></el-input>
+                </el-form-item>
+            </el-form>
+            <div class="dialog-footer" slot="footer">
+                <el-button @click="addoreditgroup" type="primary">确 定</el-button>
+                <el-button @click="cancel">取 消</el-button>
+            </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import {getAllGroup} from '@/api/business/droolsapi'
+    import {addNewGroup, getAllGroup, getSingleGroup, updateGroup} from '@/api/business/droolsapi'
 
     export default {
         name: "grouplist",
@@ -93,9 +109,11 @@
                 // 非多个禁用
                 multiple: true,
                 //对话框
-                dialogTableVisible: false,
+                addoreditdislog: false,
                 //规则列表
                 grouplist: [],
+                //分组类型
+                typeOptions: [],
                 //查询条件
                 paramQuery: {
                     groupName: '',
@@ -103,10 +121,24 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                groupdata: {
+                    groupName: '',
+                    id: 0,
+                    groupType: '',
+                    groupDesc: ''
+                },
                 //数据总条数
                 total: 0,
                 //dialog标题
-                title: ''
+                title: '',
+                rules: {
+                    groupName: [
+                        {required: true, message: "分组名称不能为空", trigger: "blur"}
+                    ],
+                    groupType: [
+                        {required: true, message: "分组类型不能为空", trigger: "change"}
+                    ]
+                }
             }
         },
         methods: {
@@ -120,15 +152,27 @@
                     this.loading = false;
                 });
             },
-            watchDetail(id) {
+            handleAdd() {
+                this.groupdata = {
+                    id: 0,
+                    groupName: '',
+                    groupType: '',
+                    groupDesc: ''
+                }
+                this.addoreditdislog = true;
+            },
+            openEdit(id) {
                 console.log(id);
-                // var idparamter = {
-                //     id: id
-                // }
-                // getEntitiyInfo(idparamter).then((res) => {
-                //     this.entityInfoList = res;
-                // });
-                this.dialogTableVisible = true;
+                var idparamter = {
+                    id: id
+                }
+                getSingleGroup(idparamter).then((res) => {
+                    this.groupdata.groupName = res.groupName;
+                    this.groupdata.groupType = res.groupType;
+                    this.groupdata.id = res.id;
+                    this.groupdata.groupDesc = res.groupDesc;
+                });
+                this.addoreditdislog = true;
             },
             /** 搜索按钮操作 */
             handleQuery() {
@@ -146,10 +190,53 @@
                 this.dateRange = [];
                 this.resetForm("queryForm");
                 this.handleQuery();
+            },
+            // 取消按钮
+            cancel() {
+                this.addoreditdislog = false;
+                this.reset();
+            },
+            reset() {
+                this.groupdata = {
+                    id: 0,
+                    groupName: '',
+                    groupType: '',
+                    groupDesc: ''
+                }
+            },
+            addoreditgroup() {
+                this.$refs["postform"].validate(valid => {
+                    if (valid) {
+                        if (this.groupdata.id > 0) {
+                            updateGroup(this.groupdata).then((res) => {
+                                console.log(res);
+                                this.addoreditdislog = false;
+                                this.$message({
+                                    message: '更新成功',
+                                    type: 'success'
+                                });
+                            })
+                        } else {
+                            addNewGroup(this.groupdata).then((res) => {
+                                console.log(res);
+                                this.addoreditdislog = false;
+                                this.$message({
+                                    message: '添加成功',
+                                    type: 'success'
+                                });
+                            })
+                        }
+                        this.handleQuery();
+                    }
+                });
             }
         },
         created() {
             this.loadData();
+            this.getDicts("drools_group_type").then(response => {
+                this.typeOptions = response.data;
+            });
+
         }
     }
 </script>

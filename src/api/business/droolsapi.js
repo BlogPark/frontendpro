@@ -35,6 +35,30 @@ export function getAllGroup(data) {
     })
 }
 
+export function addNewGroup(data) {
+    return request({
+        url: '/drools/addgroup',
+        method: 'post',
+        data: data
+    })
+}
+
+export function updateGroup(data) {
+    return request({
+        url: '/drools/updategroup',
+        method: 'post',
+        data: data
+    })
+}
+
+export function getSingleGroup(data) {
+    return request({
+        url: '/drools/getsinglegroup',
+        method: 'get',
+        params: data
+    })
+}
+
 /**模板部分*/
 export function getAllTemplate(data) {
     return request({
