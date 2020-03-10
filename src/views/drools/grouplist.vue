@@ -85,7 +85,7 @@
                     <el-input placeholder="请输入分组描述" type="textarea" v-model="groupdata.groupDesc"></el-input>
                 </el-form-item>
             </el-form>
-            <div class="dialog-footer" slot="footer">
+            <div class="dialog-footer" slot="footer" style="padding-top:20px">
                 <el-button @click="addoreditgroup" type="primary">确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>

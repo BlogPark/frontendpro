@@ -43,8 +43,8 @@
         [{header: [1, 2, 3, 4, 5, 6, false]}], // 标题
         [{color: []}, {background: []}], // 字体颜色、字体背景颜色
         [{align: []}], // 对齐方式
-        ["clean"], // 清除文本格式
-        ["link", "image", "video"] // 链接、图片、视频
+        ["clean"]// , 清除文本格式
+        //["link", "image", "video"] // 链接、图片、视频
     ];
 
     export default {
@@ -97,6 +97,7 @@
         methods: {
             onEditorBlur() {
                 //失去焦点事件
+                console.log(this.content);
             },
             onEditorFocus() {
                 //获得焦点事件
@@ -117,7 +118,7 @@
                 }
             },
 
-            quillImgSuccess(res, file) {
+            quillImgSuccess(res) {// quillImgSuccess(res, file) {
                 // res为图片服务器返回的数据
                 // 获取富文本组件实例
                 const quill = this.$refs.quillEditor.quill;
