@@ -17,6 +17,22 @@ export function getEntitiyInfo(data) {
     })
 }
 
+export function getsingleentity(data) {
+    return request({
+        url: '/drools/getentity',
+        method: 'get',
+        params: data
+    })
+}
+
+export function getentitysbyids(data) {
+    return request({
+        url: '/drools/getentitisbyids',
+        method: 'post',
+        data: data
+    })
+}
+
 /**规则部分*/
 export function getAllRule(data) {
     return request({
@@ -78,7 +94,7 @@ export function getSingleTemplate(data) {
 
 export function addTemplate(data) {
     return request({
-        url: '/drools/addTemplate',
+        url: '/drools/addtemplate',
         method: 'post',
         data: data
     })
@@ -96,6 +112,33 @@ export function editTemplate(data) {
 export function getAllFunction(data) {
     return request({
         url: '/drools/functionlist',
+        method: 'post',
+        data: data
+    })
+}
+
+export function getfunctionlistbyids(data) {
+    return request({
+        url: '/drools/getfunctionids',
+        method: 'post',
+        data: data
+    })
+}
+
+export function getsinglefunction(data) {
+    return request({
+        url: '/drools/getfunction',
+        method: 'get',
+        params: data
+    })
+}
+
+/**
+ * 其他部分
+ */
+export function getquotelist(data) {
+    return request({
+        url: '/drools/getquotelist',
         method: 'post',
         data: data
     })

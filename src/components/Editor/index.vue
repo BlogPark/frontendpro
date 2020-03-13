@@ -15,6 +15,7 @@
 
         <!-- 富文本组件 -->
         <quill-editor
+                :disabled="disabled"
                 :options="editorOption"
                 @blur="onEditorBlur($event)"
                 @change="onEditorChange($event)"
@@ -59,6 +60,13 @@
             maxSize: {
                 type: Number,
                 default: 4000 //kb
+            },
+            /**
+             * 是否可用
+             */
+            disabled: {
+                type: Boolean,
+                default: false
             }
         },
         data() {
@@ -97,7 +105,7 @@
         methods: {
             onEditorBlur() {
                 //失去焦点事件
-                console.log(this.content);
+                //console.log(this.content);
             },
             onEditorFocus() {
                 //获得焦点事件

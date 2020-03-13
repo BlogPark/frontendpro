@@ -81,6 +81,8 @@
                         <el-form-item label="可编辑" prop="canChanged">
                             <el-switch
                                     :disabled="disableedit"
+                                    active-value="1"
+                                    inactive-value="0"
                                     v-model="templatedata.canChanged">
                             </el-switch>
                         </el-form-item>
@@ -134,7 +136,32 @@
             <div align="center" class="dialog-footer" slot="footer" style="padding-top:20px" v-show="disableedit">
                 <el-button @click="cancel" type="primary">关闭</el-button>
             </div>
-            <el-dialog :title="dialogtitle" :visible.sync="quotedialog" append-to-body width="20%">
+            <el-dialog :title="dialogtitle" :visible.sync="quotedialog" append-to-body width="600px">
+                <el-table
+                        :data="quotelist"
+                        @selection-change="handleSelectionChange"
+                        v-loading="loading">
+                    <el-table-column align="center" type="selection" width="60"/>
+                    <el-table-column
+                            align="center"
+                            label="名称"
+                            prop="name"
+                            width="250">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            label="描述"
+                            prop="desc"
+                            width="250">
+                    </el-table-column>
+                </el-table>
+                <pagination
+                        :limit.sync="quoteparams.pageSize"
+                        :page.sync="quoteparams.pageIndex"
+                        :total="quotetotal"
+                        @pagination="openquotedialog(0)"
+                        v-show="quotetotal>0"
+                />
                 <div class="dialog-footer" slot="footer" style="padding-top:20px">
                     <el-button @click="addquote" type="primary">确 定</el-button>
                     <el-button @click="cancelquote">取 消</el-button>
@@ -145,7 +172,15 @@
 </template>
 
 <script>
-    import {addTemplate, editTemplate, getAllTemplate, getSingleTemplate} from '@/api/business/droolsapi'
+    import {
+        addTemplate,
+        editTemplate,
+        getAllTemplate,
+        getentitysbyids,
+        getfunctionlistbyids,
+        getquotelist,
+        getSingleTemplate
+    } from '@/api/business/droolsapi'
     import Editor from '@/components/Editor';
 
     export default {
@@ -175,13 +210,13 @@
                     templateName: '',
                     templateDesc: '',
                     quoteEntities: '',
-                    canChanged: '',
+                    canChanged: 0,
                     templateContent: '',
                     quoteFunctions: ''
                 },
                 rules: {
                     templateName: [
-                        {required: true, message: "分组名称不能为空", trigger: "blur"}
+                        {required: true, message: "模板名称不能为空", trigger: "blur"}
                     ]
                 },
                 //引用函数集合
@@ -191,7 +226,23 @@
                 //弹出框名称
                 dialogtitle: '',
                 //引用弹出框是否显示
-                quotedialog: false
+                quotedialog: false,
+                //引用列表信息
+                quotelist: [],
+                //引用总数
+                quotetotal: 0,
+                //引用查询参数
+                quoteparams: {
+                    type: 1,
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                // 选中数组
+                ids: [],
+                // 非单个禁用
+                single: true,
+                // 非多个禁用
+                multiple: true
             }
         },
         methods: {
@@ -247,23 +298,37 @@
                 this.addoreditdialog = false;
                 this.reset();
             },
+            reset() {
+                this.templatedata = {
+                    id: 0,
+                    templateName: '',
+                    templateDesc: '',
+                    quoteEntities: '',
+                    canChanged: 0,
+                    templateContent: '',
+                    quoteFunctions: ''
+                }
+            },
             //添加按钮
             handleAdd() {
-                this.groupdata = {
+                this.templatedata = {
                     id: 0,
-                    groupName: '',
-                    groupType: '',
-                    groupDesc: ''
+                    templateName: '',
+                    templateDesc: '',
+                    quoteEntities: '',
+                    canChanged: '',
+                    templateContent: '',
+                    quoteFunctions: ''
                 }
+                this.disableedit = false;
                 this.addoreditdialog = true;
             },
             //新增或者编辑确认
             addoredittemplate() {
                 this.$refs["postform"].validate(valid => {
                     if (valid) {
-                        if (this.groupdata.id > 0) {
+                        if (this.templatedata.id > 0) {
                             editTemplate(this.templatedata).then((res) => {
-                                console.log(res);
                                 this.addoreditdialog = false;
                                 this.$message({
                                     message: '更新成功',
@@ -271,8 +336,8 @@
                                 });
                             })
                         } else {
+                            console.log(this.templatedata)
                             addTemplate(this.templatedata).then((res) => {
-                                console.log(res);
                                 this.addoreditdialog = false;
                                 this.$message({
                                     message: '添加成功',
@@ -316,22 +381,79 @@
             },
             //打开添加引用窗体
             openquotedialog(type) {
-                if (type === 1) {
-                    //添加函数引用
-                    this.dialogtitle = '函数列表';
-                } else if (type === 2) {
-                    //添加实体引用
-                    this.dialogtitle = '实体列表';
+                //添加函数引用
+                this.dialogtitle = '函数列表';
+                //添加实体引用
+                this.dialogtitle = '实体列表';
+                if (type !== 0) {
+                    this.quoteparams.type = type;
                 }
+                getquotelist(this.quoteparams).then((res) => {
+                    this.quotelist = res.list;
+                    this.quotetotal = res.total;
+                });
                 this.quotedialog = true;
             },
             //确认添加
             addquote() {
-
+                var newids = [];
+                if (this.quoteparams.type === 1) {
+                    const functionarry = this.templatedata.quoteFunctions.split(',')
+                    this.ids.forEach(item => {
+                        if (functionarry.indexOf(item.toString()) < 0) {
+                            newids.push(item);
+                        }
+                    })
+                    if (newids.length > 0) {
+                        const idsStr = newids.join(',');
+                        const postdata = {idList: newids}
+                        //函数
+                        getfunctionlistbyids(postdata).then((res) => {
+                            this.quotefunctionlist = this.quotefunctionlist.concat(res);
+                        });
+                        if (this.templatedata.quoteFunctions == '') {
+                            this.templatedata.quoteFunctions += idsStr;
+                        } else {
+                            this.templatedata.quoteFunctions += ',' + idsStr;
+                        }
+                    }
+                } else if (this.quoteparams.type === 2) {
+                    //实体
+                    const entityarry = this.templatedata.quoteEntities.split(',')
+                    this.ids.forEach(item => {
+                        if (entityarry.indexOf(item.toString()) < 0) {
+                            newids.push(item);
+                        }
+                    })
+                    if (newids.length > 0) {
+                        const idsStr = newids.join(',');
+                        const postdata = {idList: newids}
+                        getentitysbyids(postdata).then((res) => {
+                            this.quoteentitylist = this.quoteentitylist.concat(res)
+                        });
+                        if (this.templatedata.quoteEntities == '') {
+                            this.templatedata.quoteEntities += idsStr;
+                        } else {
+                            this.templatedata.quoteEntities += ',' + idsStr;
+                        }
+                    }
+                }
+                this.ids = []
+                this.quotedialog = false
+                this.$message({
+                    message: '操作成功',
+                    type: 'success'
+                })
             },
             //取消添加
             cancelquote() {
                 this.quotedialog = false
+            },
+            // 多选框选中数据
+            handleSelectionChange(selection) {
+                this.ids = selection.map(item => item.id)
+                this.single = selection.length != 1
+                this.multiple = !selection.length
             }
         },
         created() {

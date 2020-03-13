@@ -28,7 +28,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(res => {
         const code = res.data.code
-        console.log(res.data.data);
+        console.log(res)
         if (code === 1000) {
             const subcode = res.data.data.code ?? 200;
             if (subcode === 401) {
