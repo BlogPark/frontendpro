@@ -1,5 +1,22 @@
 <template>
     <div class="app-container">
+        <el-form :inline="true" :model="queryParams" ref="queryForm">
+            <el-form-item label="实体名称" prop="templateName">
+                <el-input
+                        @keyup.enter.native="handleQuery"
+                        clearable
+                        placeholder="请输入实体名称"
+                        size="small"
+                        style="width: 240px"
+                        v-model="queryParams.entityName"
+                />
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="handleQuery" icon="el-icon-search" size="mini" type="primary">搜索</el-button>
+                <el-button @click="resetQuery" icon="el-icon-refresh" size="mini" type="info">重置</el-button>
+            </el-form-item>
+        </el-form>
+
         <el-table
                 :data="entitylist"
                 v-loading="loading">
@@ -38,8 +55,8 @@
             </el-table-column>
         </el-table>
         <pagination
-                :limit.sync="pageSize"
-                :page.sync="pageIndex"
+                :limit.sync="queryParams.pageSize"
+                :page.sync="queryParams.pageIndex"
                 :total="total"
                 @pagination="loadData"
                 v-show="total>0"
@@ -57,6 +74,7 @@
 <script>
     import {getAllEntities, getEntitiyInfo} from '@/api/business/droolsapi'
 
+
     export default {
         name: "entitylist",
         data() {
@@ -64,38 +82,31 @@
                 // 遮罩层
                 loading: true,
                 entitylist: [],
-                groupName: '',
-                groupId: '',
-                entityName: '',
-                id: 0,
                 dialogTableVisible: false,
                 entityInfoList: [],
-                pageIndex: 1,
-                pageSize: 10,
-                total: 0
+                total: 0,
+                queryParams:{
+                    id:0,
+                    entityName:'',
+                    groupId:0,
+                    groupName:'',
+                    pageIndex:1,
+                    pageSize:10
+                }
             }
         },
         methods: {
             loadData() {
                 this.loading = true;
-                var postdata = {
-                    id: this.id,
-                    groupName: this.groupName,
-                    entityName: this.entityName,
-                    groupId: this.groupId,
-                    pageSize: this.pageSize,
-                    pageIndex: this.pageIndex
-                }
-                getAllEntities(postdata).then((res) => {
+                getAllEntities(this.queryParams).then((res) => {
                     this.entitylist = res.list;
-                    this.pageIndex = res.pageNum;
-                    this.pageSize = res.pageSize;
+                    this.queryParams.pageIndex = res.pageNum;
+                    this.queryParams.pageSize = res.pageSize;
                     this.total = res.total;
                     this.loading = false;
                 });
             },
             watchDetail(id) {
-                console.log(id);
                 var idparamter = {
                     id: id
                 }
@@ -103,6 +114,16 @@
                     this.entityInfoList = res;
                 });
                 this.dialogTableVisible = true;
+            },
+            /** 搜索按钮操作 */
+            handleQuery() {
+                this.queryParams.pageIndex = 1;
+                this.loadData();
+            },
+            /** 重置按钮操作 */
+            resetQuery() {
+                this.resetForm("queryForm");
+                this.handleQuery();
             }
         },
         created() {

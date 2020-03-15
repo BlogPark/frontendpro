@@ -27,17 +27,27 @@
                     align="center"
                     label="模板编号"
                     prop="id"
-                    width="250">
+                    width="150">
             </el-table-column>
             <el-table-column
                     label="模板名称"
                     prop="templateName"
-                    width="350">
+                    width="250">
             </el-table-column>
             <el-table-column
                     label="模板描述"
                     prop="templateDesc"
                     width="400">
+            </el-table-column>
+            <el-table-column
+                    label="可编辑"
+                    width="100">
+                <template slot-scope="scope1">
+                    <el-switch
+                            v-model="scope1.row.canChanged===1"
+                            disabled>
+                    </el-switch>
+                </template>
             </el-table-column>
             <el-table-column
                     label="创建时间"
@@ -124,7 +134,13 @@
                     </el-col>
                     <el-col :span="24">
                         <el-form-item label="模板内容">
-                            <Editor :disabled="disableedit" v-model="templatedata.templateContent"/>
+                            <codemirror
+                                    ref="mycode"
+                                    placeholder="请输入规则内容"
+                                    :value="templatedata.templateContent"
+                                    :options="cmOptions"
+                                    @input="onCmCodeChange"
+                                    class="code" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -163,7 +179,7 @@
                         v-show="quotetotal>0"
                 />
                 <div class="dialog-footer" slot="footer" style="padding-top:20px">
-                    <el-button @click="addquote" type="primary">确 定</el-button>
+                    <el-button type="primary" @click="addquote">确 定</el-button>
                     <el-button @click="cancelquote">取 消</el-button>
                 </div>
             </el-dialog>
@@ -182,11 +198,13 @@
         getSingleTemplate
     } from '@/api/business/droolsapi'
     import Editor from '@/components/Editor';
+    import {codemirror} from 'vue-codemirror'
+    import './codemirrorsettings'
 
     export default {
-        name: "templatelist",
+        name: "TemplateList",
         components: {
-            Editor
+            codemirror
         },
         data() {
             return {
@@ -242,17 +260,40 @@
                 // 非单个禁用
                 single: true,
                 // 非多个禁用
-                multiple: true
+                multiple: true,
+                //codemirror参数
+                cmOptions: {
+                    value: '',
+                    mode: 'text/x-groovy',
+                    theme: "darcula",
+                    smartIndent: true,
+                    readOnly: this.disableedit,
+                    lineNumbers: true,
+                    lineSeparator: '&',
+                    cursorHeight: 0.75
+                }
             }
+        },
+        watch: {
+            disableedit: {
+                handler(newVal, objVal) {
+                    console.log(newVal)
+                    this.cmOptions.readOnly = newVal;
+                },
+                deep: true,
+                immediate: true
+            }
+        },
+        created() {
+            this.loadData();
         },
         methods: {
             //数据加载
             loadData() {
                 this.loading = true;
                 getAllTemplate(this.queryParams).then((res) => {
+                    console.log(res.list)
                     this.templatelist = res.list;
-                    this.pageIndex = res.pageNum;
-                    this.pageSize = res.pageSize;
                     this.total = res.total;
                     this.loading = false;
                 });
@@ -320,6 +361,9 @@
                     templateContent: '',
                     quoteFunctions: ''
                 }
+                this.quotefunctionlist = [];
+                //引用实体集合
+                this.quoteentitylist = [];
                 this.disableedit = false;
                 this.addoreditdialog = true;
             },
@@ -336,7 +380,6 @@
                                 });
                             })
                         } else {
-                            console.log(this.templatedata)
                             addTemplate(this.templatedata).then((res) => {
                                 this.addoreditdialog = false;
                                 this.$message({
@@ -348,6 +391,7 @@
                         this.handleQuery();
                     }
                 });
+
             },
             //取消函数引用
             handleCloseFunction(tag) {
@@ -454,10 +498,11 @@
                 this.ids = selection.map(item => item.id)
                 this.single = selection.length != 1
                 this.multiple = !selection.length
+            },
+            //代码编辑器输入事件
+            onCmCodeChange(instance) {
+                this.templatedata.templateContent = instance
             }
-        },
-        created() {
-            this.loadData();
         }
     }
 </script>
