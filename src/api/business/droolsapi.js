@@ -75,6 +75,14 @@ export function getSingleGroup(data) {
     })
 }
 
+export function selectGroupList() {
+    return request({
+        url: '/drools/selectgrouplist',
+        method: 'get',
+        params: null
+    })
+}
+
 /**模板部分*/
 export function getAllTemplate(data) {
     return request({
@@ -108,6 +116,14 @@ export function editTemplate(data) {
     })
 }
 
+export function selectTemplateList() {
+    return request({
+        url: '/drools/gettemplatelist',
+        method: 'get',
+        params: null
+    })
+}
+
 /**函数部分*/
 export function getAllFunction(data) {
     return request({
@@ -128,6 +144,30 @@ export function getfunctionlistbyids(data) {
 export function getsinglefunction(data) {
     return request({
         url: '/drools/getfunction',
+        method: 'get',
+        params: data
+    })
+}
+
+export function editFunction(data) {
+    return request({
+        url: '/drools/editfunction',
+        method: 'post',
+        data: data
+    })
+}
+
+export function addFunction(data) {
+    return request({
+        url: '/drools/addfunction',
+        method: 'post',
+        data: data
+    })
+}
+
+export function getFunction(data) {
+    return request({
+        url: '/drools/getsinglefunction',
         method: 'get',
         params: data
     })

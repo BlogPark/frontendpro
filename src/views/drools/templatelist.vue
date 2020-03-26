@@ -44,8 +44,8 @@
                     width="100">
                 <template slot-scope="scope1">
                     <el-switch
-                            v-model="scope1.row.canChanged===1"
-                            disabled>
+                            disabled
+                            v-model="scope1.row.canChanged===1">
                     </el-switch>
                 </template>
             </el-table-column>
@@ -135,12 +135,12 @@
                     <el-col :span="24">
                         <el-form-item label="模板内容">
                             <codemirror
-                                    ref="mycode"
-                                    placeholder="请输入规则内容"
-                                    :value="templatedata.templateContent"
                                     :options="cmOptions"
+                                    :value="templatedata.templateContent"
                                     @input="onCmCodeChange"
-                                    class="code" />
+                                    class="code"
+                                    placeholder="请输入规则内容"
+                                    ref="mycode"/>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -179,7 +179,7 @@
                         v-show="quotetotal>0"
                 />
                 <div class="dialog-footer" slot="footer" style="padding-top:20px">
-                    <el-button type="primary" @click="addquote">确 定</el-button>
+                    <el-button @click="addquote" type="primary">确 定</el-button>
                     <el-button @click="cancelquote">取 消</el-button>
                 </div>
             </el-dialog>
@@ -197,7 +197,6 @@
         getquotelist,
         getSingleTemplate
     } from '@/api/business/droolsapi'
-    import Editor from '@/components/Editor';
     import {codemirror} from 'vue-codemirror'
     import './codemirrorsettings'
 

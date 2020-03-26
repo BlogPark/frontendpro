@@ -28,7 +28,7 @@
             <el-table-column
                     label="实体路径"
                     prop="entityPackage"
-                    width="350">
+                    width="450">
             </el-table-column>
             <el-table-column
                     label="实体描述"
@@ -50,7 +50,6 @@
                 <template slot-scope="scope">
                     <el-button @click="watchDetail(scope.row.id)" icon="el-icon-view" size="small" type="text">查看
                     </el-button>
-                    <el-button icon="el-icon-edit" size="small" type="text">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -85,13 +84,13 @@
                 dialogTableVisible: false,
                 entityInfoList: [],
                 total: 0,
-                queryParams:{
-                    id:0,
-                    entityName:'',
-                    groupId:0,
-                    groupName:'',
-                    pageIndex:1,
-                    pageSize:10
+                queryParams: {
+                    id: 0,
+                    entityName: '',
+                    groupId: 0,
+                    groupName: '',
+                    pageIndex: 1,
+                    pageSize: 10
                 }
             }
         },
