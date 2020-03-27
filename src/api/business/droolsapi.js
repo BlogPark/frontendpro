@@ -42,6 +42,30 @@ export function getAllRule(data) {
     })
 }
 
+export function addNewRule(data) {
+    return request({
+        url: '/drools/addrule',
+        method: 'post',
+        data: data
+    })
+}
+
+export function editRule(data) {
+    return request({
+        url: '/drools/editrule',
+        method: 'post',
+        data: data
+    })
+}
+
+export function getSingleRule(data) {
+    return request({
+        url: '',
+        method: 'get',
+        params: data
+    })
+}
+
 /**分组部分*/
 export function getAllGroup(data) {
     return request({

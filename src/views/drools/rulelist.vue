@@ -33,13 +33,13 @@
             </el-table-column>
         </el-table>
         <pagination
-                :limit.sync="pageSize"
-                :page.sync="pageIndex"
+                :limit.sync="queryParams.pageSize"
+                :page.sync="queryParams.pageIndex"
                 :total="total"
                 @pagination="loadData"
                 v-show="total>0"
         />
-        <el-dialog :visible.sync="dialogTableVisible" title="字段详情" width="30%">
+        <el-dialog :visible.sync="addoreditdialog" title="规则详情" width="40%">
             <!--<el-table :data="entityInfoList" border stripe>-->
             <!--<el-table-column label="字段名" property="fieldName" width="150"></el-table-column>-->
             <!--<el-table-column label="字段描述" property="fieldDesc" width="200"></el-table-column>-->
@@ -50,7 +50,18 @@
 </template>
 
 <script>
-    import {getAllRule} from '@/api/business/droolsapi'
+    import {
+        addNewRule,
+        editRule,
+        getAllRule,
+        getfunctionlistbyids,
+        getquotelist,
+        getSingleRule,
+        selectGroupList,
+        selectTemplateList
+    } from '@/api/business/droolsapi'
+    import {codemirror} from 'vue-codemirror'
+    import './codemirrorsettings'
 
     export default {
         name: "rulelist",
@@ -59,33 +70,94 @@
                 // 遮罩层
                 loading: true,
                 //对话框
-                dialogTableVisible: false,
+                addoreditdialog: false,
                 //规则列表
                 rulelist: [],
-                ruleName: '',
-                ruleCode: '',
-                ruleGroup: '',
-                id: 0,
-                pageIndex: 1,
-                pageSize: 10,
-                total: 0
+                //查询参数
+                queryParams: {
+                    id: 0,
+                    ruleName: '',
+                    ruleCode: '',
+                    groupName: '',
+                    pageIndex: 1,
+                    pageSize: 10,
+                },
+                //规则实体
+                ruledata: {
+                    id: 0,
+                    ruleCode: '',
+                    ruleName: '',
+                    ruleGroup: '',
+                    templateId: 0,
+                    ruleContent: '',
+                    quoteEntities: '',
+                    quoteFunctions: ''
+                },
+                //引用的实体集合
+                quoteEntities: [],
+                total: 0,
+                // 选中数组
+                ids: [],
+                // 非单个禁用
+                single: true,
+                // 非多个禁用
+                multiple: true,
+                //codemirror参数
+                cmOptions: {
+                    value: '',
+                    mode: 'text/x-groovy',
+                    theme: "darcula",
+                    smartIndent: true,
+                    readOnly: this.disableedit,
+                    lineNumbers: true,
+                    lineSeparator: '&',
+                    cursorHeight: 0.75
+                },
+                //表单验证规则
+                rules: {
+                    templateName: [
+                        {required: true, message: "模板名称不能为空", trigger: "blur"}
+                    ]
+                },
+                //引用函数集合
+                quotefunctionlist: [],
+                //引用实体集合
+                quoteentitylist: [],
+                //弹出框名称
+                dialogtitle: '',
+                //引用弹出框是否显示
+                quotedialog: false,
+                //引用列表信息
+                quotelist: [],
+                //引用总数
+                quotetotal: 0,
+                //引用查询参数
+                quoteparams: {
+                    type: 1,
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                //分组数据
+                grouplist: []
+            }
+        },
+        watch: {
+            disableedit: {
+                handler(newVal, objVal) {
+                    console.log(newVal)
+                    this.cmOptions.readOnly = newVal;
+                },
+                deep: true,
+                immediate: true
             }
         },
         methods: {
             loadData() {
                 this.loading = true;
-                var postdata = {
-                    id: this.id,
-                    ruleCode: this.ruleCode,
-                    ruleName: this.ruleName,
-                    groupName: this.ruleGroup,
-                    pageSize: this.pageSize,
-                    pageIndex: this.pageIndex
-                }
-                getAllRule(postdata).then((res) => {
+                getAllRule(this.queryParams).then((res) => {
                     this.rulelist = res.list;
-                    this.pageIndex = res.pageNum;
-                    this.pageSize = res.pageSize;
+                    this.queryParams.pageIndex = res.pageNum;
+                    this.queryParams.pageSize = res.pageSize;
                     this.total = res.total;
                     this.loading = false;
                 });
@@ -98,11 +170,219 @@
                 // getEntitiyInfo(idparamter).then((res) => {
                 //     this.entityInfoList = res;
                 // });
-                this.dialogTableVisible = true;
+                this.addoreditdialog = true;
+            },
+            //编辑按钮
+            editDetail(id) {
+                var idparamter = {
+                    id: id
+                }
+                getSingleRule(idparamter).then((res) => {
+                    this.ruledata = res.rule;
+                    this.quotefunctionlist = res.quoteFunctions;
+                    this.quoteentitylist = res.quoteEntities;
+                });
+                this.disableedit = false;
+                this.addoreditdialog = true;
+            },
+            /** 搜索按钮操作 */
+            handleQuery() {
+                this.queryParams.pageIndex = 1;
+                this.loadData();
+            },
+            /** 重置按钮操作 */
+            resetQuery() {
+                this.resetForm("queryForm");
+                this.handleQuery();
+            },
+            // 取消按钮
+            cancel() {
+                this.addoreditdialog = false;
+                this.reset();
+            },
+            reset() {
+                this.ruledata = {
+                    id: 0,
+                    ruleCode: '',
+                    ruleName: '',
+                    ruleGroup: '',
+                    templateId: 0,
+                    ruleContent: '',
+                    quoteEntities: '',
+                    quoteFunctions: ''
+                }
+            },
+            //添加按钮
+            handleAdd() {
+                this.ruledata = {
+                    id: 0,
+                    ruleCode: '',
+                    ruleName: '',
+                    ruleGroup: '',
+                    templateId: 0,
+                    ruleContent: '',
+                    quoteEntities: '',
+                    quoteFunctions: ''
+                }
+                this.quotefunctionlist = [];
+                //引用实体集合
+                this.quoteentitylist = [];
+                this.disableedit = false;
+                this.addoreditdialog = true;
+            },
+            //新增或者编辑确认
+            addoredittemplate() {
+                this.$refs["postform"].validate(valid => {
+                    if (valid) {
+                        if (this.ruledata.id > 0) {
+                            editRule(this.ruledata).then((res) => {
+                                this.addoreditdialog = false;
+                                this.$message({
+                                    message: '更新成功',
+                                    type: 'success'
+                                });
+                            })
+                        } else {
+                            addNewRule(this.ruledata).then((res) => {
+                                this.addoreditdialog = false;
+                                this.$message({
+                                    message: '添加成功',
+                                    type: 'success'
+                                });
+                            })
+                        }
+                        this.handleQuery();
+                    }
+                });
+
+            },
+            //取消函数引用
+            handleCloseFunction(tag) {
+                this.$confirm('删除引用函数可能造成模板错误, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    //确定
+                    var functionarry = this.ruledata.quoteFunctions.split(',');
+                    functionarry.splice(functionarry.indexOf(tag.id), 1);
+                    this.ruledata.quoteFunctions = functionarry.join(',');
+                    this.quotefunctionlist.splice(this.quotefunctionlist.indexOf(tag), 1);
+                }).catch(() => {
+                    //取消
+                });
+            },
+            //取消实体引用
+            handleCloseEntity(entity) {
+                this.$confirm('删除引用实体可能造成模板错误, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var entityarry = this.ruledata.quoteEntities.split(',');
+                    entityarry.splice(entityarry.indexOf(entity.id), 1);
+                    this.ruledata.quoteEntities = entityarry.join(',');
+                    this.quoteentitylist.splice(this.quoteentitylist.indexOf(entity), 1);
+                }).catch(() => {
+                });
+            },
+            //打开添加引用窗体
+            openquotedialog(type) {
+                if (type === 1) {
+                    //添加函数引用
+                    this.dialogtitle = '函数列表';
+                }
+                if (type === 2) {
+                    //添加实体引用
+                    this.dialogtitle = '实体列表';
+                }
+                if (type !== 0) {
+                    this.quoteparams.type = type;
+                }
+                getquotelist(this.quoteparams).then((res) => {
+                    this.quotelist = res.list;
+                    this.quotetotal = res.total;
+                });
+                this.quotedialog = true;
+            },
+            //确认添加
+            addquote() {
+                var newids = [];
+                if (this.quoteparams.type === 1) {
+                    const functionarry = this.ruledata.quoteFunctions.split(',')
+                    this.ids.forEach(item => {
+                        if (functionarry.indexOf(item.toString()) < 0) {
+                            newids.push(item);
+                        }
+                    })
+                    if (newids.length > 0) {
+                        const idsStr = newids.join(',');
+                        const postdata = {idList: newids}
+                        //函数
+                        getfunctionlistbyids(postdata).then((res) => {
+                            this.quotefunctionlist = this.quotefunctionlist.concat(res);
+                        });
+                        if (this.templatedata.quoteFunctions == '') {
+                            this.templatedata.quoteFunctions += idsStr;
+                        } else {
+                            this.templatedata.quoteFunctions += ',' + idsStr;
+                        }
+                    }
+                } else if (this.quoteparams.type === 2) {
+                    //实体
+                    const entityarry = this.templatedata.quoteEntities.split(',')
+                    this.ids.forEach(item => {
+                        if (entityarry.indexOf(item.toString()) < 0) {
+                            newids.push(item);
+                        }
+                    })
+                    if (newids.length > 0) {
+                        const idsStr = newids.join(',');
+                        const postdata = {idList: newids}
+                        getentitysbyids(postdata).then((res) => {
+                            this.quoteentitylist = this.quoteentitylist.concat(res)
+                        });
+                        if (this.templatedata.quoteEntities == '') {
+                            this.templatedata.quoteEntities += idsStr;
+                        } else {
+                            this.templatedata.quoteEntities += ',' + idsStr;
+                        }
+                    }
+                }
+                this.ids = []
+                this.quotedialog = false
+                this.$message({
+                    message: '操作成功',
+                    type: 'success'
+                })
+            }
+            ,
+            //取消添加
+            cancelquote() {
+                this.quotedialog = false
+            }
+            ,
+            // 多选框选中数据
+            handleSelectionChange(selection) {
+                this.ids = selection.map(item => item.id)
+                this.single = selection.length != 1
+                this.multiple = !selection.length
+            }
+            ,
+            //代码编辑器输入事件
+            onCmCodeChange(instance) {
+                this.templatedata.templateContent = instance
+            }
+            ,
+            querygroup() {
+                selectGroupList().then((res) => {
+                    this.grouplist = res;
+                })
             }
         },
         created() {
             this.loadData();
+            this.querygroup();
         }
     }
 </script>

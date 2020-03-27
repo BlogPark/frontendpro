@@ -297,6 +297,16 @@
                 grouplist: []
             }
         },
+        watch: {
+            disableedit: {
+                handler(newVal, objVal) {
+                    console.log(newVal)
+                    this.cmOptions.readOnly = newVal;
+                },
+                deep: true,
+                immediate: true
+            }
+        },
         methods: {
             loadData() {
                 this.loading = true;

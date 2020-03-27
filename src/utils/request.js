@@ -29,7 +29,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(res => {
         const code = res.data.code
         console.log(res)
-        if (code === 1000 || code === 200) {
+        if (code === 1000 || code === 200 || code === 401) {
             const subcode = res.data.data.code ?? 200;
             if (code === 401) {
                 MessageBox.confirm(
