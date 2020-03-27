@@ -1,5 +1,24 @@
 <template>
     <div class="app-container">
+        <el-form :inline="true" :model="queryParams" ref="queryForm">
+            <el-form-item label="规则名称" prop="templateName">
+                <el-input
+                        @keyup.enter.native="handleQuery"
+                        clearable
+                        placeholder="请输入规则名称"
+                        size="small"
+                        style="width: 240px"
+                        v-model="queryParams.ruleName"
+                />
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="handleQuery" icon="el-icon-search" size="mini" type="primary">搜索</el-button>
+                <el-button @click="resetQuery" icon="el-icon-refresh" size="mini" type="info">重置</el-button>
+                <el-button @click="handleAdd" icon="el-icon-plus" size="mini" type="success"
+                           v-hasPermi="['system:role:add']">新增
+                </el-button>
+            </el-form-item>
+        </el-form>
         <el-table
                 :data="rulelist"
                 v-loading="loading">
@@ -58,7 +77,7 @@
         getquotelist,
         getSingleRule,
         selectGroupList,
-        selectTemplateList
+        selectTemplateList,getentitysbyids
     } from '@/api/business/droolsapi'
     import {codemirror} from 'vue-codemirror'
     import './codemirrorsettings'
@@ -322,15 +341,15 @@
                         getfunctionlistbyids(postdata).then((res) => {
                             this.quotefunctionlist = this.quotefunctionlist.concat(res);
                         });
-                        if (this.templatedata.quoteFunctions == '') {
-                            this.templatedata.quoteFunctions += idsStr;
+                        if (this.ruledata.quoteFunctions == '') {
+                            this.ruledata.quoteFunctions += idsStr;
                         } else {
-                            this.templatedata.quoteFunctions += ',' + idsStr;
+                            this.ruledata.quoteFunctions += ',' + idsStr;
                         }
                     }
                 } else if (this.quoteparams.type === 2) {
                     //实体
-                    const entityarry = this.templatedata.quoteEntities.split(',')
+                    const entityarry = this.ruledata.quoteEntities.split(',')
                     this.ids.forEach(item => {
                         if (entityarry.indexOf(item.toString()) < 0) {
                             newids.push(item);
@@ -342,10 +361,10 @@
                         getentitysbyids(postdata).then((res) => {
                             this.quoteentitylist = this.quoteentitylist.concat(res)
                         });
-                        if (this.templatedata.quoteEntities == '') {
-                            this.templatedata.quoteEntities += idsStr;
+                        if (this.ruledata.quoteEntities == '') {
+                            this.ruledata.quoteEntities += idsStr;
                         } else {
-                            this.templatedata.quoteEntities += ',' + idsStr;
+                            this.ruledata.quoteEntities += ',' + idsStr;
                         }
                     }
                 }
@@ -371,7 +390,7 @@
             ,
             //代码编辑器输入事件
             onCmCodeChange(instance) {
-                this.templatedata.templateContent = instance
+                this.ruledata.ruleContent = instance
             }
             ,
             querygroup() {
