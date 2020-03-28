@@ -47,7 +47,8 @@
                 <template slot-scope="scope">
                     <el-button @click="watchDetail(scope.row.id)" icon="el-icon-view" size="small" type="text">查看
                     </el-button>
-                    <el-button icon="el-icon-edit" size="small" type="text">编辑</el-button>
+                    <el-button @click="editDetail(scope.row.id)" icon="el-icon-edit" size="small" type="text">编辑
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -59,11 +60,130 @@
                 v-show="total>0"
         />
         <el-dialog :visible.sync="addoreditdialog" title="规则详情" width="40%">
-            <!--<el-table :data="entityInfoList" border stripe>-->
-            <!--<el-table-column label="字段名" property="fieldName" width="150"></el-table-column>-->
-            <!--<el-table-column label="字段描述" property="fieldDesc" width="200"></el-table-column>-->
-            <!--<el-table-column label="字段类型" property="fieldType"></el-table-column>-->
-            <!--</el-table>-->
+            <el-form :model="ruledata" :rules="rules" label-width="120px" ref="postform">
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="规则编码" prop="ruleCode">
+                            <el-input :disabled="disableedit" placeholder="请输入规则描述"
+                                      v-model="ruledata.ruleCode"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="规则名称" prop="ruleName">
+                            <el-input :disabled="disableedit" placeholder="请输入规则名称"
+                                      v-model="ruledata.ruleName"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="所属分组" prop="ruleGroup">
+                            <el-select :disabled="disableedit" v-model="ruledata.ruleGroup">
+                                <el-option
+                                        :key="group.id"
+                                        :label="group.groupName"
+                                        :value="group.groupName"
+                                        v-for="group in grouplist"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="引用模板" prop="templateId">
+                            <el-select :disabled="disableedit" v-model="ruledata.templateId">
+                                <el-option
+                                        :key="template.id"
+                                        :label="template.templateName"
+                                        :value="template.id"
+                                        v-for="template in templatelist"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="引用函数" prop="quoteFunctions">
+                            <el-input :disabled="disableedit" placeholder="引用函数"
+                                      v-model="ruledata.quoteFunctions" v-show="false"/>
+                            <el-tag
+                                    :closable="!disableedit"
+                                    :key="tag.id"
+                                    @close="handleCloseFunction(tag)"
+                                    type="success"
+                                    v-for="tag in quotefunctionlist">
+                                {{tag.functionName}}({{tag.functionDesc}})
+                            </el-tag>
+                            <el-button @click="openquotedialog(1)" class="button-new-tag" size="small"
+                                       v-show="!disableedit">+
+                                添加新引用
+                            </el-button>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="引用实体" prop="quoteEntities">
+                            <el-input :disabled="disableedit" v-model="ruledata.quoteEntities" v-show="false"/>
+                            <el-tag
+                                    :closable="!disableedit"
+                                    :key="entity.id"
+                                    @close="handleCloseEntity(entity)"
+                                    type="success"
+                                    v-for="entity in quoteentitylist">
+                                {{entity.entityName}}({{entity.entityDesc}})
+                            </el-tag>
+                            <el-button @click="openquotedialog(2)" class="button-new-tag" size="small"
+                                       v-show="!disableedit">+
+                                添加新引用
+                            </el-button>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="规则内容">
+                            <codemirror
+                                    :options="cmOptions"
+                                    :value="ruledata.ruleContent"
+                                    @input="onCmCodeChange"
+                                    class="code"
+                                    placeholder="请输入规则内容"
+                                    ref="mycode"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div class="dialog-footer" slot="footer" v-show="!disableedit">
+                <el-button @click="addoredittemplate" type="primary">确 定</el-button>
+                <el-button @click="cancel">取 消</el-button>
+            </div>
+            <div align="center" class="dialog-footer" slot="footer" v-show="disableedit">
+                <el-button @click="cancel" type="primary">关闭</el-button>
+            </div>
+            <el-dialog :title="dialogtitle" :visible.sync="quotedialog" append-to-body width="600px">
+                <el-table
+                        :data="quotelist"
+                        @selection-change="handleSelectionChange"
+                        v-loading="loading">
+                    <el-table-column align="center" type="selection" width="60"/>
+                    <el-table-column
+                            align="center"
+                            label="名称"
+                            prop="name"
+                            width="250">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            label="描述"
+                            prop="desc"
+                            width="250">
+                    </el-table-column>
+                </el-table>
+                <pagination
+                        :limit.sync="quoteparams.pageSize"
+                        :page.sync="quoteparams.pageIndex"
+                        :total="quotetotal"
+                        @pagination="openquotedialog(0)"
+                        v-show="quotetotal>0"
+                />
+                <div class="dialog-footer" slot="footer" style="padding-top:20px">
+                    <el-button @click="addquote" type="primary">确 定</el-button>
+                    <el-button @click="cancelquote">取 消</el-button>
+                </div>
+            </el-dialog>
         </el-dialog>
     </div>
 </template>
@@ -73,11 +193,12 @@
         addNewRule,
         editRule,
         getAllRule,
+        getentitysbyids,
         getfunctionlistbyids,
         getquotelist,
         getSingleRule,
         selectGroupList,
-        selectTemplateList,getentitysbyids
+        selectTemplateList
     } from '@/api/business/droolsapi'
     import {codemirror} from 'vue-codemirror'
     import './codemirrorsettings'
@@ -90,6 +211,8 @@
                 loading: true,
                 //对话框
                 addoreditdialog: false,
+                //是否可编辑
+                disableedit: false,
                 //规则列表
                 rulelist: [],
                 //查询参数
@@ -107,7 +230,7 @@
                     ruleCode: '',
                     ruleName: '',
                     ruleGroup: '',
-                    templateId: 0,
+                    templateId: '',
                     ruleContent: '',
                     quoteEntities: '',
                     quoteFunctions: ''
@@ -157,7 +280,9 @@
                     pageSize: 10
                 },
                 //分组数据
-                grouplist: []
+                grouplist: [],
+                //模板列表
+                templatelist: []
             }
         },
         watch: {
@@ -183,12 +308,15 @@
             },
             watchDetail(id) {
                 console.log(id);
-                // var idparamter = {
-                //     id: id
-                // }
-                // getEntitiyInfo(idparamter).then((res) => {
-                //     this.entityInfoList = res;
-                // });
+                var idparamter = {
+                    id: id
+                }
+                getSingleRule(idparamter).then((res) => {
+                    this.ruledata = res.rule;
+                    this.quotefunctionlist = res.quoteFunctions;
+                    this.quoteentitylist = res.quoteEntities;
+                });
+                this.disableedit = true;
                 this.addoreditdialog = true;
             },
             //编辑按钮
@@ -225,7 +353,7 @@
                     ruleCode: '',
                     ruleName: '',
                     ruleGroup: '',
-                    templateId: 0,
+                    templateId: '',
                     ruleContent: '',
                     quoteEntities: '',
                     quoteFunctions: ''
@@ -238,7 +366,7 @@
                     ruleCode: '',
                     ruleName: '',
                     ruleGroup: '',
-                    templateId: 0,
+                    templateId: '',
                     ruleContent: '',
                     quoteEntities: '',
                     quoteFunctions: ''
@@ -284,7 +412,7 @@
                 }).then(() => {
                     //确定
                     var functionarry = this.ruledata.quoteFunctions.split(',');
-                    functionarry.splice(functionarry.indexOf(tag.id), 1);
+                    functionarry.splice(functionarry.indexOf(tag.id + ''), 1);
                     this.ruledata.quoteFunctions = functionarry.join(',');
                     this.quotefunctionlist.splice(this.quotefunctionlist.indexOf(tag), 1);
                 }).catch(() => {
@@ -374,34 +502,36 @@
                     message: '操作成功',
                     type: 'success'
                 })
-            }
-            ,
+            },
             //取消添加
             cancelquote() {
                 this.quotedialog = false
-            }
-            ,
+            },
             // 多选框选中数据
             handleSelectionChange(selection) {
                 this.ids = selection.map(item => item.id)
                 this.single = selection.length != 1
                 this.multiple = !selection.length
-            }
-            ,
+            },
             //代码编辑器输入事件
             onCmCodeChange(instance) {
                 this.ruledata.ruleContent = instance
-            }
-            ,
+            },
             querygroup() {
                 selectGroupList().then((res) => {
                     this.grouplist = res;
+                })
+            },
+            querytemplate() {
+                selectTemplateList().then((res) => {
+                    this.templatelist = res;
                 })
             }
         },
         created() {
             this.loadData();
             this.querygroup();
+            this.querytemplate();
         }
     }
 </script>
@@ -409,5 +539,9 @@
 <style scoped>
     .el-dialog-style {
         width: 40%;
+    }
+
+    .el-dialog__body {
+        padding: 30px 20px 5px 20px;
     }
 </style>

@@ -60,7 +60,7 @@ export function editRule(data) {
 
 export function getSingleRule(data) {
     return request({
-        url: '',
+        url: '/drools/selectsinglerule',
         method: 'get',
         params: data
     })
