@@ -198,6 +198,41 @@ export function getFunction(data) {
 }
 
 /**
+ * 产品部分
+ */
+export function getProductList(data) {
+    return request({
+        url: '/drools/getproductlist',
+        method: 'post',
+        data: data
+    })
+}
+
+export function addProduct(data) {
+    return request({
+        url: '/drools/addproduct',
+        method: 'post',
+        data: data
+    })
+}
+
+export function editProduct(data) {
+    return request({
+        url: '/drools/editprosuct',
+        method: 'post',
+        data: data
+    })
+}
+
+export function selectSingleProduct(data) {
+    return request({
+        url: '/drools/getproductinfo',
+        method: 'get',
+        params: data
+    })
+}
+
+/**
  * 其他部分
  */
 export function getquotelist(data) {
