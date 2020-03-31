@@ -268,7 +268,7 @@
                     smartIndent: true,
                     readOnly: this.disableedit,
                     lineNumbers: true,
-                    lineSeparator: '&',
+                    lineSeparator: '###',
                     cursorHeight: 0.75
                 }
             }
