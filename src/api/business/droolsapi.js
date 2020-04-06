@@ -66,6 +66,14 @@ export function getSingleRule(data) {
     })
 }
 
+export function getrulelistbyids(data) {
+    return request({
+        url: '/drools/getruleids',
+        method: 'post',
+        data: data
+    })
+}
+
 /**分组部分*/
 export function getAllGroup(data) {
     return request({

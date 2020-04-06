@@ -53,6 +53,8 @@
                     </el-button>
                     <el-button @click="editDetail(scope.row.id)" icon="el-icon-edit" size="small" type="text">编辑
                     </el-button>
+                    <el-button @click="editDetail(scope.row.id)" icon="el-icon-edit" size="small" type="text">编译规则
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -99,7 +101,7 @@
                     <el-col :span="24">
                         <el-form-item label="配置规则" prop="quoteRules">
                             <el-input :disabled="disableedit" v-model="productData.quoteRules" v-show="false"/>
-                            <el-button @click="openquotedialog(2)" class="button-new-tag" size="small"
+                            <el-button @click="openquotedialog(3)" class="button-new-tag" size="small"
                                        v-show="!disableedit">+
                                 添加新规则
                             </el-button>
@@ -107,13 +109,13 @@
                     </el-col>
                     <el-col :span="24">
                         <draggable :list="quoteRuleList" :set-data="setData" class="dragArea" group="article">
-                            <div :key="rule.id" class="list-complete-item" v-for="rule in quoteRuleList">
+                            <div :key="rule.id" class="list-complete-item" v-for="(rule,index) in quoteRuleList">
                                 <div class="list-complete-item-handle">
-                                    {{ rule.ruleCode }}[{{ rule.ruleGroup }}] {{ rule.ruleName }}
+                                    [{{ index+1 }}] {{ rule.ruleCode }} {{ rule.ruleName }}
                                 </div>
                                 <div style="position:absolute;right:0px;">
                                          <span @click="deleteEle(rule)"
-                                               style="float: right ;margin-top: -20px;margin-right:5px;">
+                                               style="float: right ;margin-top: -16px;margin-right:5px;">
                                          <i class="el-icon-delete" style="color:#ff4949"/>
                                           </span>
                                 </div>
@@ -123,7 +125,7 @@
                 </el-row>
             </el-form>
             <div class="dialog-footer" slot="footer" v-show="!disableedit">
-                <el-button type="primary">确 定</el-button>
+                <el-button type="primary" @click="saveData">确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
             <div align="center" class="dialog-footer" slot="footer" v-show="disableedit">
@@ -165,7 +167,14 @@
 </template>
 
 <script>
-    import {addProduct, editProduct, getProductList, selectSingleProduct} from '@/api/business/droolsapi'
+    import {
+        addProduct,
+        editProduct,
+        getProductList,
+        selectSingleProduct,
+        getquotelist,
+        getrulelistbyids
+    } from '@/api/business/droolsapi'
     import draggable from 'vuedraggable'
 
     export default {
@@ -207,7 +216,21 @@
                 //允许编辑
                 disableedit: false,
                 //引用对话框
-                quotedialog: false
+                quotedialog: false,
+                dialogtitle: '',
+                //引用总数
+                quotetotal: 0,
+                //引用查询参数
+                quoteparams: {
+                    type: 1,
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                //引用列表
+                quotelist: [],
+                //表单验证
+                rules: {}
+
             }
         },
         methods: {
@@ -270,13 +293,108 @@
                 dataTransfer.setData('Text', '')
             },
             deleteEle(ele) {
-                for (const item of this.quoteRuleList) {
-                    if (item.id === ele.id) {
-                        const index = this.quoteRuleList.indexOf(item)
-                        this.quoteRuleList.splice(index, 1)
-                        break
+                this.$confirm('确认要删除该规则?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var entityarry = this.productData.quoteRules.split(',');
+                    entityarry.splice(entityarry.indexOf(ele.id + ''), 1);
+                    this.productData.quoteRules = entityarry.join(',');
+                    this.quoteRuleList.splice(this.quoteRuleList.indexOf(ele), 1);
+                }).catch(() => {
+                });
+                //
+                // for (const item of this.quoteRuleList) {
+                //     if (item.id === ele.id) {
+                //         const index = this.quoteRuleList.indexOf(item)
+                //         this.quoteRuleList.splice(index, 1)
+                //         break
+                //     }
+                // }
+                console.log(this.quoteRuleList)
+            },
+            //打开添加引用窗体
+            openquotedialog(type) {
+                //添加函数引用
+                this.dialogtitle = '规则列表';
+                if (type !== 0) {
+                    this.quoteparams.type = type;
+                }
+                getquotelist(this.quoteparams).then((res) => {
+                    this.quotelist = res.list;
+                    this.quotetotal = res.total;
+                });
+                this.quotedialog = true;
+            },
+            //确认添加
+            addquote() {
+                var newids = [];
+                if (this.quoteparams.type === 3) {
+                    if(this.quoteRuleList==null){
+                        this.quoteRuleList=[]
+                    }
+                    const rulearry = this.productData.quoteRules.split(',')
+                    this.ids.forEach(item => {
+                        if (rulearry.indexOf(item.toString()) < 0) {
+                            newids.push(item);
+                        }
+                    })
+                    console.log(newids)
+                    if (newids.length > 0) {
+                        const idsStr = newids.join(',');
+                        const postdata = {idList: newids}
+                        //函数
+                        getrulelistbyids(postdata).then((res) => {
+                            this.quoteRuleList = this.quoteRuleList.concat(res);
+                        });
+                        if (this.productData.quoteRules == '') {
+                            this.productData.quoteRules += idsStr;
+                        } else {
+                            this.productData.quoteRules += ',' + idsStr;
+                        }
                     }
                 }
+                this.ids = []
+                this.quotedialog = false
+                this.$message({
+                    message: '操作成功',
+                    type: 'success'
+                })
+            },
+            //取消添加
+            cancelquote() {
+                this.quotedialog = false
+            },
+            // 多选框选中数据
+            handleSelectionChange(selection) {
+                this.ids = selection.map(item => item.id)
+                this.single = selection.length != 1
+                this.multiple = !selection.length
+            },
+            // 取消按钮
+            cancel() {
+                this.addAndEditDialog = false;
+                //this.reset();
+            },
+            reset() {
+                this.productData = {
+                    id: '',
+                    productCode: '',
+                    productName: '',
+                    versionCode: '',
+                    ruleFilePath: '',
+                    blogPackage: '',
+                    quoteRules: ''
+                }
+            },
+            saveData() {
+                if (this.productData.id > 0) {
+                    console.log('修改信息')
+                } else {
+                    console.log('添加信息')
+                }
+                this.addAndEditDialog = false;
             }
         }
     }
@@ -314,9 +432,10 @@
         position: relative;
         font-size: 14px;
         padding: 5px 12px;
-        margin-top: 4px;
+        margin-bottom: 5px;
         border: 1px solid #bfcbd9;
         transition: all 1s;
+        background-color: aliceblue;
     }
 
     .list-complete-item-handle {
