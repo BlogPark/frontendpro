@@ -291,9 +291,9 @@
             loadData() {
                 this.loading = true;
                 getAllTemplate(this.queryParams).then((res) => {
-                    console.log(res.list)
-                    this.templatelist = res.list;
-                    this.total = res.total;
+                    console.log(res.data.list)
+                    this.templatelist = res.data.list;
+                    this.total = res.data.total;
                     this.loading = false;
                 });
             },
@@ -304,9 +304,9 @@
                     id: id
                 }
                 getSingleTemplate(idparamter).then((res) => {
-                    this.templatedata = res.templatesModel;
-                    this.quotefunctionlist = res.functionModelList;
-                    this.quoteentitylist = res.entityModelList;
+                    this.templatedata = res.data.templatesModel;
+                    this.quotefunctionlist = res.data.functionModelList;
+                    this.quoteentitylist = res.data.entityModelList;
                 });
                 this.addoreditdialog = true;
             },
@@ -316,9 +316,9 @@
                     id: id
                 }
                 getSingleTemplate(idparamter).then((res) => {
-                    this.templatedata = res.templatesModel;
-                    this.quotefunctionlist = res.functionModelList;
-                    this.quoteentitylist = res.entityModelList;
+                    this.templatedata = res.data.templatesModel;
+                    this.quotefunctionlist = res.data.functionModelList;
+                    this.quoteentitylist = res.data.entityModelList;
                 });
                 this.disableedit = false;
                 this.addoreditdialog = true;
@@ -432,8 +432,8 @@
                     this.quoteparams.type = type;
                 }
                 getquotelist(this.quoteparams).then((res) => {
-                    this.quotelist = res.list;
-                    this.quotetotal = res.total;
+                    this.quotelist = res.data.list;
+                    this.quotetotal = res.data.total;
                 });
                 this.quotedialog = true;
             },
@@ -452,7 +452,7 @@
                         const postdata = {idList: newids}
                         //函数
                         getfunctionlistbyids(postdata).then((res) => {
-                            this.quotefunctionlist = this.quotefunctionlist.concat(res);
+                            this.quotefunctionlist = this.quotefunctionlist.concat(res.data);
                         });
                         if (this.templatedata.quoteFunctions == '') {
                             this.templatedata.quoteFunctions += idsStr;
@@ -472,7 +472,7 @@
                         const idsStr = newids.join(',');
                         const postdata = {idList: newids}
                         getentitysbyids(postdata).then((res) => {
-                            this.quoteentitylist = this.quoteentitylist.concat(res)
+                            this.quoteentitylist = this.quoteentitylist.concat(res.data)
                         });
                         if (this.templatedata.quoteEntities == '') {
                             this.templatedata.quoteEntities += idsStr;

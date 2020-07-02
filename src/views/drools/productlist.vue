@@ -125,7 +125,7 @@
                 </el-row>
             </el-form>
             <div class="dialog-footer" slot="footer" v-show="!disableedit">
-                <el-button type="primary" @click="saveData">确 定</el-button>
+                <el-button @click="saveData" type="primary">确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
             <div align="center" class="dialog-footer" slot="footer" v-show="disableedit">
@@ -171,9 +171,9 @@
         addProduct,
         editProduct,
         getProductList,
-        selectSingleProduct,
         getquotelist,
-        getrulelistbyids
+        getrulelistbyids,
+        selectSingleProduct
     } from '@/api/business/droolsapi'
     import draggable from 'vuedraggable'
 
@@ -237,10 +237,10 @@
             loadData() {
                 this.loading = true;
                 getProductList(this.queryParams).then((res) => {
-                    this.productList = res.list
-                    this.total = res.total
-                    this.queryParams.pageIndex = res.pageNum
-                    this.queryParams.pageSize = res.pageSize
+                    this.productList = res.data.list
+                    this.total = res.data.total
+                    this.queryParams.pageIndex = res.data.pageNum
+                    this.queryParams.pageSize = res.data.pageSize
                     this.loading = false;
                 })
             },
@@ -270,8 +270,8 @@
                     id: id
                 }
                 selectSingleProduct(param).then((res) => {
-                    this.productData = res.product
-                    this.quoteRuleList = res.rules
+                    this.productData = res.data.product
+                    this.quoteRuleList = res.data.rules
                 })
                 this.disableedit = true
                 this.addAndEditDialog = true
@@ -281,8 +281,8 @@
                     id: id
                 }
                 selectSingleProduct(param).then((res) => {
-                    this.productData = res.product
-                    this.quoteRuleList = res.rules
+                    this.productData = res.data.product
+                    this.quoteRuleList = res.data.rules
                 })
                 this.disableedit = false
                 this.addAndEditDialog = true
@@ -322,8 +322,8 @@
                     this.quoteparams.type = type;
                 }
                 getquotelist(this.quoteparams).then((res) => {
-                    this.quotelist = res.list;
-                    this.quotetotal = res.total;
+                    this.quotelist = res.data.list;
+                    this.quotetotal = res.data.total;
                 });
                 this.quotedialog = true;
             },
@@ -331,8 +331,8 @@
             addquote() {
                 var newids = [];
                 if (this.quoteparams.type === 3) {
-                    if(this.quoteRuleList==null){
-                        this.quoteRuleList=[]
+                    if (this.quoteRuleList == null) {
+                        this.quoteRuleList = []
                     }
                     const rulearry = this.productData.quoteRules.split(',')
                     this.ids.forEach(item => {
@@ -346,7 +346,7 @@
                         const postdata = {idList: newids}
                         //函数
                         getrulelistbyids(postdata).then((res) => {
-                            this.quoteRuleList = this.quoteRuleList.concat(res);
+                            this.quoteRuleList = this.quoteRuleList.concat(res.data);
                         });
                         if (this.productData.quoteRules == '') {
                             this.productData.quoteRules += idsStr;

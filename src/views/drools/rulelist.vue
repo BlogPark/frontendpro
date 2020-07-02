@@ -299,10 +299,10 @@
             loadData() {
                 this.loading = true;
                 getAllRule(this.queryParams).then((res) => {
-                    this.rulelist = res.list;
-                    this.queryParams.pageIndex = res.pageNum;
-                    this.queryParams.pageSize = res.pageSize;
-                    this.total = res.total;
+                    this.rulelist = res.data.list;
+                    this.queryParams.pageIndex = res.data.pageNum;
+                    this.queryParams.pageSize = res.data.pageSize;
+                    this.total = res.data.total;
                     this.loading = false;
                 });
             },
@@ -312,9 +312,9 @@
                     id: id
                 }
                 getSingleRule(idparamter).then((res) => {
-                    this.ruledata = res.rule;
-                    this.quotefunctionlist = res.quoteFunctions;
-                    this.quoteentitylist = res.quoteEntities;
+                    this.ruledata = res.data.rule;
+                    this.quotefunctionlist = res.data.quoteFunctions;
+                    this.quoteentitylist = res.data.quoteEntities;
                 });
                 this.disableedit = true;
                 this.addoreditdialog = true;
@@ -325,9 +325,9 @@
                     id: id
                 }
                 getSingleRule(idparamter).then((res) => {
-                    this.ruledata = res.rule;
-                    this.quotefunctionlist = res.quoteFunctions;
-                    this.quoteentitylist = res.quoteEntities;
+                    this.ruledata = res.data.rule;
+                    this.quotefunctionlist = res.data.quoteFunctions;
+                    this.quoteentitylist = res.data.quoteEntities;
                 });
                 this.disableedit = false;
                 this.addoreditdialog = true;
@@ -519,12 +519,12 @@
             },
             querygroup() {
                 selectGroupList().then((res) => {
-                    this.grouplist = res;
+                    this.grouplist = res.data;
                 })
             },
             querytemplate() {
                 selectTemplateList().then((res) => {
-                    this.templatelist = res;
+                    this.templatelist = res.data;
                 })
             }
         },

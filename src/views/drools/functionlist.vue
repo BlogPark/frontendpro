@@ -311,10 +311,10 @@
             loadData() {
                 this.loading = true;
                 getAllFunction(this.queryParams).then((res) => {
-                    this.functionlist = res.list;
-                    this.queryParams.pageIndex = res.pageNum;
-                    this.queryParams.pageSize = res.pageSize;
-                    this.total = res.total;
+                    this.functionlist = res.data.list;
+                    this.queryParams.pageIndex = res.data.pageNum;
+                    this.queryParams.pageSize = res.data.pageSize;
+                    this.total = res.data.total;
                     this.loading = false;
                 });
             },
@@ -322,8 +322,8 @@
                 console.log(id);
                 var params = {id: id}
                 getFunction(params).then((res) => {
-                    this.functiondata = res.functionModel;
-                    this.quoteentitylist = res.quoteEntities;
+                    this.functiondata = res.data.functionModel;
+                    this.quoteentitylist = res.data.quoteEntities;
                 });
                 if (type === 1) {
                     this.disableedit = true;
@@ -387,8 +387,8 @@
                     this.quoteparams.type = type;
                 }
                 getquotelist(this.quoteparams).then((res) => {
-                    this.quotelist = res.list;
-                    this.quotetotal = res.total;
+                    this.quotelist = res.data.list;
+                    this.quotetotal = res.data.total;
                 });
                 this.quotedialog = true;
             },
@@ -407,7 +407,7 @@
                         const idsStr = newids.join(',');
                         const postdata = {idList: newids}
                         getentitysbyids(postdata).then((res) => {
-                            this.quoteentitylist = this.quoteentitylist.concat(res)
+                            this.quoteentitylist = this.quoteentitylist.concat(res.data)
                         });
                         if (this.functiondata.quoteEntities == '') {
                             this.functiondata.quoteEntities += idsStr;
@@ -484,7 +484,7 @@
             },
             querygroup() {
                 selectGroupList().then((res) => {
-                    this.grouplist = res;
+                    this.grouplist = res.data;
                 })
             }
         },

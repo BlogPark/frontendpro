@@ -98,10 +98,10 @@
             loadData() {
                 this.loading = true;
                 getAllEntities(this.queryParams).then((res) => {
-                    this.entitylist = res.list;
-                    this.queryParams.pageIndex = res.pageNum;
-                    this.queryParams.pageSize = res.pageSize;
-                    this.total = res.total;
+                    this.entitylist = res.data.list;
+                    this.queryParams.pageIndex = res.data.pageNum;
+                    this.queryParams.pageSize = res.data.pageSize;
+                    this.total = res.data.total;
                     this.loading = false;
                 });
             },
@@ -110,7 +110,7 @@
                     id: id
                 }
                 getEntitiyInfo(idparamter).then((res) => {
-                    this.entityInfoList = res;
+                    this.entityInfoList = res.data;
                 });
                 this.dialogTableVisible = true;
             },

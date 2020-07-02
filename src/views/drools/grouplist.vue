@@ -145,10 +145,10 @@
             loadData() {
                 this.loading = true;
                 getAllGroup(this.paramQuery).then((res) => {
-                    this.grouplist = res.list;
-                    this.paramQuery.pageIndex = res.pageNum;
-                    this.paramQuery.pageSize = res.pageSize;
-                    this.total = res.total;
+                    this.grouplist = res.data.list;
+                    this.paramQuery.pageIndex = res.data.pageNum;
+                    this.paramQuery.pageSize = res.data.pageSize;
+                    this.total = res.data.total;
                     this.loading = false;
                 });
             },
@@ -167,10 +167,10 @@
                     id: id
                 }
                 getSingleGroup(idparamter).then((res) => {
-                    this.groupdata.groupName = res.groupName;
-                    this.groupdata.groupType = res.groupType;
-                    this.groupdata.id = res.id;
-                    this.groupdata.groupDesc = res.groupDesc;
+                    this.groupdata.groupName = res.data.groupName;
+                    this.groupdata.groupType = res.data.groupType;
+                    this.groupdata.id = res.data.id;
+                    this.groupdata.groupDesc = res.data.groupDesc;
                 });
                 this.addoreditdislog = true;
             },
