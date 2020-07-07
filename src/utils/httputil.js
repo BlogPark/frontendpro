@@ -4,7 +4,7 @@ import {Message} from "element-ui"
 
 axios.defaults.timeout = 5000
 
-axios.defaults.baseURL = "/api/demo"
+axios.defaults.baseURL = process.env.VUE_APP_ERP_BASE_URL
 
 //http request 拦截器
 axios.interceptors.request.use(
@@ -84,7 +84,7 @@ export function fetch(url, params = {}) {
                         //错误处理
                         Message.error(response.data.message)
                     }
-                }else {
+                } else {
                     Message.error("服务器异常！！")
                 }
             })
